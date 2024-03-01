@@ -1,11 +1,12 @@
+import { endorserResponse } from './endorser-response.interface';
+
 export interface applicantReponse {
   _id: string;
-  nombre: string;
-  paterno: string;
-  materno: string;
-  telefono: number;
+  firstname: string;
+  middlename: string;
+  lastname: string;
   dni: string;
-  direccion: string;
-  activo: boolean;
-  cuenta: boolean;
+  professional_profile: string;
+  candidate_for: string;
+  endorsers: endorserResponse[];
 }

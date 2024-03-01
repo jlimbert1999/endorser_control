@@ -10,11 +10,18 @@ export class EndorserService {
   private readonly url = `${environment.url}/endorsers`;
   constructor(private http: HttpClient) {}
 
-  create(name: string, people: number) {
-    return this.http.post<endorserResponse>(`${this.url}`, { name, people });
+  create(name: string, organization: string) {
+    return this.http.post<endorserResponse>(`${this.url}`, {
+      name,
+      organization,
+    });
   }
 
   findAll() {
     return this.http.get<{ endorsers: endorserResponse[] }>(`${this.url}`);
+  }
+
+  searchAvailables(term: string) {
+    return this.http.get<endorserResponse[]>(`${this.url}/available/${term}`);
   }
 }

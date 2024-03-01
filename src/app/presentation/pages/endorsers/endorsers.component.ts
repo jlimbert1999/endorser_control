@@ -7,7 +7,6 @@ import {
   signal,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 import { EndorserService } from '../../services/endorser.service';
 import {
@@ -17,7 +16,6 @@ import {
 import { OrganizationService } from '../../services/organization.service';
 import { EndorserComponent } from './endorser/endorser.component';
 import { PrimengModule } from '../../../primeng.module';
-import { ListboxFilterEvent } from 'primeng/listbox';
 
 @Component({
   selector: 'app-endorsers',
@@ -30,15 +28,17 @@ import { ListboxFilterEvent } from 'primeng/listbox';
   ],
   templateUrl: './endorsers.component.html',
   styleUrl: './endorsers.component.css',
-  providers: [DialogService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EndorsersComponent implements OnInit {
   private endorserService = inject(EndorserService);
   private organizationService = inject(OrganizationService);
-  private dialog = inject(DialogService);
   private fb = inject(FormBuilder);
 
+  Form = this.fb.nonNullable.group({
+    name: ['', Validators.required],
+    organization: ['', Validators.required],
+  });
   visible: boolean = false;
   datasource = signal<endorserResponse[]>([]);
   organizations = signal<organizationResponse[]>([]);
@@ -52,16 +52,15 @@ export class EndorsersComponent implements OnInit {
   }
 
   save() {
-    // this.endorserService
-    //   .create(
-    //     this.FormEndorser.get('name')!.value,
-    //     this.FormEndorser.get('people')!.value
-    //   )
-    //   .subscribe((resp) => {
-    //     console.log(resp);
-    //     this.closeDialog();
-    //     this.datasource.update((values) => [resp, ...values]);
-    //   });
+    this.endorserService
+      .create(
+        this.Form.get('name')!.value,
+        this.Form.get('organization')!.value
+      )
+      .subscribe((resp) => {
+        this.close();
+        this.datasource.update((values) => [resp, ...values]);
+      });
   }
 
   getData() {
@@ -71,8 +70,14 @@ export class EndorsersComponent implements OnInit {
   }
 
   searchOrganizations(term: string) {
-    this.organizationService.findAll().subscribe((data) => {
-      this.organizations.set(data.organizations);
+    if (term === '') return;
+    this.organizationService.searchAvailable(term).subscribe((data) => {
+      this.organizations.set(data);
     });
+  }
+
+  close() {
+    this.Form.reset({});
+    this.visible = false;
   }
 }

@@ -7,6 +7,9 @@ import { TableModule } from 'primeng/table';
 import { DropdownModule } from 'primeng/dropdown';
 import { ToolbarModule } from 'primeng/toolbar';
 import { ListboxModule } from 'primeng/listbox';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 @NgModule({
   declarations: [],
   imports: [],
@@ -19,6 +22,9 @@ import { ListboxModule } from 'primeng/listbox';
     ToolbarModule,
     DropdownModule,
     ListboxModule,
+    AutoCompleteModule,
+    InputGroupModule,
+    InputGroupAddonModule,
   ],
 })
 export class PrimengModule {}

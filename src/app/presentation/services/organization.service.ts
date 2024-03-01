@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { organizationResponse } from '../../infrastructure/interfaces';
+import { debounceTime } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +16,14 @@ export class OrganizationService {
   }
 
   findAll() {
+    return this.http.get<{ organizations: organizationResponse[] }>(
+      `${this.url}`
+    );
+  }
+
+  searchAvailable(term: string) {
     return this.http
-      .get<{ organizations: organizationResponse[] }>(`${this.url}`)
+      .get<organizationResponse[]>(`${this.url}/available/${term}`)
+      .pipe(debounceTime(2000));
   }
 }

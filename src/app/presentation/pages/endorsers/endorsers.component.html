@@ -31,14 +31,14 @@
     <ng-template pTemplate="header">
       <tr>
         <th>Nombre</th>
-        <th>Cupos</th>
+        <th>Organizacion social</th>
         <th></th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-item>
       <tr>
         <td>{{ item.name }}</td>
-        <td>{{ item.people }}</td>
+        <td>{{ item.organization.name }}</td>
         <td></td>
       </tr>
     </ng-template>
@@ -46,83 +46,57 @@
 </div>
 
 <p-dialog
-  [visible]="visible"
-  [style]="{ width: '450px' }"
-  header="Product Details"
+  (onHide)="close()"
+  [(visible)]="visible"
+  [style]="{ width: '600px' }"
+  header="Registro aval"
   [modal]="true"
   styleClass="p-fluid"
 >
   <ng-template pTemplate="content">
-    <div class="field">
-      <label for="name">Name</label>
-      <input type="text" pInputText id="name" required autofocus />
-    </div>
-    <div class="field">
-      <label for="description">Description</label>
-      <textarea
-        id="description"
-        pInputTextarea
-        required
-        rows="3"
-        cols="20"
-      ></textarea>
-    </div>
+    <form [formGroup]="Form">
+      <div class="field">
+        <label for="name">Nombre del aval</label>
+        <input
+          type="text"
+          pInputText
+          id="name"
+          formControlName="name"
+          required
+        />
+      </div>
 
-    <div class="field">
-      <label for="inventoryStatus">Inventory Status</label>
-      <p-dropdown inputId="inventoryStatus"> </p-dropdown>
-    </div>
-
-    <div class="field">
-      <label class="mb-3">Category</label>
-      <div class="formgrid grid">
-        <div class="field-radiobutton col-6">
-          <label for="category1">Accessories</label>
-        </div>
-        <div class="field-radiobutton col-6">
-          <label for="category2">Clothing</label>
-        </div>
-        <div class="field-radiobutton col-6">
-          <label for="category3">Electronics</label>
-        </div>
-        <div class="field-radiobutton col-6">
-          <label for="category4">Fitness</label>
-        </div>
-      </div>
-    </div>
-    <p-listbox
-      (onFilter)="searchOrganizations($event.filter)"
-      [options]="organizations()"
-      optionLabel="name"
-      [filter]="true"
-      [style]="{ width: '15rem' }"
-      [listStyle]="{ 'max-height': '220px' }"
-    ></p-listbox>
-    
-    <div class="formgrid grid">
-      <div class="field col">
-        <label for="price">Price</label>
-      </div>
-      <div class="field col">
-        <label for="quantity">Quantity</label>
-      </div>
-    </div>
+      <p-dropdown
+        [options]="organizations()"
+        formControlName="organization"
+        [filter]="true"
+        filterBy="name"
+        [showClear]="true"
+        placeholder="Buscar organizacion"
+        emptyMessage="Sin resultados"
+        emptyFilterMessage="Sin resultados"
+        appendTo="body"
+        optionValue="_id"
+        (onFilter)="searchOrganizations($event.filter)"
+      >
+        <ng-template pTemplate="selectedItem" let-selectedOption>
+          <div class="flex align-items-center gap-2">
+            <div>{{ selectedOption.name }}</div>
+          </div>
+        </ng-template>
+        <ng-template let-country pTemplate="item">
+          <div class="flex align-items-center gap-2">
+            <div>{{ country.name }}</div>
+          </div>
+        </ng-template>
+      </p-dropdown>
+    </form>
   </ng-template>
-
   <ng-template pTemplate="footer">
-    <button
-      pButton
-      pRipple
-      label="Cancel"
-      icon="pi pi-times"
-      class="p-button-text"
-    ></button>
-    <button
-      pButton
-      pRipple
-      label="Save"
-      icon="pi pi-check"
-      class="p-button-text"
-    ></button>
+    <p-button
+      label="Guardar"
+      [disabled]="Form.invalid"
+      (onClick)="save()"
+    ></p-button>
   </ng-template>
 </p-dialog>
