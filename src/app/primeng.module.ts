@@ -10,6 +10,7 @@ import { ListboxModule } from 'primeng/listbox';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+import { FileUploadModule } from 'primeng/fileupload';
 @NgModule({
   declarations: [],
   imports: [],
@@ -25,6 +26,7 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
     AutoCompleteModule,
     InputGroupModule,
     InputGroupAddonModule,
+    FileUploadModule,
   ],
 })
 export class PrimengModule {}

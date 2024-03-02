@@ -10,6 +10,15 @@
         (click)="news()"
       ></button>
     </ng-template>
+    <ng-template pTemplate="right">
+      <button
+        pButton
+        pRipple
+        label="Cargar"
+        icon="pi pi-upload"
+        (click)="loadExcelFile()"
+      ></button>
+    </ng-template>
   </p-toolbar>
   <div class="p-2">
     <p-table

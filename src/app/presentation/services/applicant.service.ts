@@ -25,6 +25,10 @@ export class ApplicantService {
     return this.http.put<applicantReponse>(`${this.url}/${id}`, applicant);
   }
 
+  upload(data: any[]) {
+    return this.http.post<applicantReponse>(`${this.url}/upload`, data);
+  }
+
   getApplicants() {
     return this.http.get<{ applicants: applicantReponse[] }>(`${this.url}`);
   }
