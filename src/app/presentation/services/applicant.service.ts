@@ -20,7 +20,18 @@ export class ApplicantService {
     return this.http.post<applicantReponse>(`${this.url}`, applicant);
   }
 
+  update(id: string, selectedEndorsers: endorserResponse[], form: Object) {
+    const applicant = CreateApplicantDto.fromForm(selectedEndorsers, form);
+    return this.http.put<applicantReponse>(`${this.url}/${id}`, applicant);
+  }
+
   getApplicants() {
     return this.http.get<{ applicants: applicantReponse[] }>(`${this.url}`);
+  }
+
+  getApplicantByEndorser(id_endorser: string) {
+    return this.http.get<applicantReponse[]>(
+      `${this.url}/endorser/${id_endorser}`
+    );
   }
 }

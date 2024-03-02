@@ -39,7 +39,14 @@
       <tr>
         <td>{{ item.name }}</td>
         <td>{{ item.organization.name }}</td>
-        <td></td>
+        <td>
+          <p-button
+            icon="pi pi-eye"
+            [rounded]="true"
+            [text]="true"
+            (onClick)="viewDetail(item)"
+          ></p-button>
+        </td>
       </tr>
     </ng-template>
   </p-table>
@@ -99,4 +106,37 @@
       (onClick)="save()"
     ></p-button>
   </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Avalados"
+  [(visible)]="dialogDetail"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '900px' }"
+>
+  @if (applicants.length>0) {
+  <p-table [value]="applicants" [tableStyle]="{ 'min-width': '50rem' }">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Nro</th>
+        <th>Nombre</th>
+        <th>CI</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-product let-rowIndex="rowIndex">
+      <tr>
+        <td>{{ rowIndex + 1 }}</td>
+        <td>
+          {{ product.firstname }} {{ product.middlename }}
+          {{ product.lastname }}
+        </td>
+        <td>{{ product.dni }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+  } @else {
+  <p>Sin avalados</p>
+  }
 </p-dialog>

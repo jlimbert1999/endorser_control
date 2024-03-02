@@ -10,12 +10,14 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { EndorserService } from '../../services/endorser.service';
 import {
+  applicantReponse,
   endorserResponse,
   organizationResponse,
 } from '../../../infrastructure/interfaces';
 import { OrganizationService } from '../../services/organization.service';
 import { EndorserComponent } from './endorser/endorser.component';
 import { PrimengModule } from '../../../primeng.module';
+import { ApplicantService } from '../../services';
 
 @Component({
   selector: 'app-endorsers',
@@ -33,6 +35,7 @@ import { PrimengModule } from '../../../primeng.module';
 export class EndorsersComponent implements OnInit {
   private endorserService = inject(EndorserService);
   private organizationService = inject(OrganizationService);
+  private applicantService = inject(ApplicantService);
   private fb = inject(FormBuilder);
 
   Form = this.fb.nonNullable.group({
@@ -40,8 +43,11 @@ export class EndorsersComponent implements OnInit {
     organization: ['', Validators.required],
   });
   visible: boolean = false;
+  dialogDetail = false;
   datasource = signal<endorserResponse[]>([]);
   organizations = signal<organizationResponse[]>([]);
+
+  applicants: applicantReponse[] = [];
 
   ngOnInit(): void {
     this.getData();
@@ -74,6 +80,20 @@ export class EndorsersComponent implements OnInit {
     this.organizationService.searchAvailable(term).subscribe((data) => {
       this.organizations.set(data);
     });
+  }
+
+  getApplicantsByEndorser(id_endorser: string) {
+    return this.applicantService
+      .getApplicantByEndorser(id_endorser)
+      .subscribe((data) => {
+        console.log(data);
+        this.applicants = data;
+      });
+  }
+
+  viewDetail(endorser: endorserResponse) {
+    this.dialogDetail = true;
+    this.getApplicantsByEndorser(endorser._id);
   }
 
   close() {

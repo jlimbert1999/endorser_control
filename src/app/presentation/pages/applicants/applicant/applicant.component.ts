@@ -31,17 +31,20 @@ import { ApplicantService, EndorserService } from '../../../services';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApplicantComponent implements OnInit {
+  id: string | undefined = undefined;
   @Input() visible = false;
   @Input() set applicant(val: applicantReponse | undefined) {
+    if (val) this.id = val._id;
     const { endorsers, ...props } = val ?? {};
     this.FormApplicant.patchValue(props);
     if (endorsers) {
-      console.log(endorsers);
       this.selectedEndorsers = endorsers;
     }
   }
-  @Output() close: EventEmitter<applicantReponse | undefined> =
-    new EventEmitter();
+
+  @Output() close: EventEmitter<
+    { data: applicantReponse; mode: 'create' | 'update' } | undefined
+  > = new EventEmitter();
 
   private fb = inject(FormBuilder);
   private endorserService = inject(EndorserService);
@@ -73,14 +76,25 @@ export class ApplicantComponent implements OnInit {
   }
 
   save() {
-    this.applicantService
-      .create(this.selectedEndorsers, this.FormApplicant.value)
-      .subscribe((data) => {
-        this.FormApplicant.reset({});
-        this.selectedEndorsers = [];
-        this.endorsers.set([]);
-        this.close.emit(data);
-      });
+    if (this.id === undefined) {
+      this.applicantService
+        .create(this.selectedEndorsers, this.FormApplicant.value)
+        .subscribe((data) => {
+          this.FormApplicant.reset({});
+          this.selectedEndorsers = [];
+          this.endorsers.set([]);
+          this.close.emit({ data, mode: 'create' });
+        });
+    } else {
+      this.applicantService
+        .update(this.id, this.selectedEndorsers, this.FormApplicant.value)
+        .subscribe((data) => {
+          this.FormApplicant.reset({});
+          this.selectedEndorsers = [];
+          this.endorsers.set([]);
+          this.close.emit({ data, mode: 'update' });
+        });
+    }
   }
 
   cancel() {
@@ -89,5 +103,4 @@ export class ApplicantComponent implements OnInit {
     this.endorsers.set([]);
     this.close.emit(undefined);
   }
-
 }

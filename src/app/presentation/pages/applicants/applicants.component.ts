@@ -48,6 +48,7 @@ export class ApplicantsComponent implements OnInit {
   private endorserService = inject(EndorserService);
 
   visible = false;
+  aceptApplincat: boolean = false;
   endorsers = signal<endorserResponse[]>([]);
   applicants = signal<applicantReponse[]>([]);
   selectedEndorsers = signal<endorserResponse[]>([]);
@@ -84,7 +85,7 @@ export class ApplicantsComponent implements OnInit {
   }
 
   edit(applicant: applicantReponse) {
-    this.applicant = applicant;
+    this.applicant = { ...applicant };
     this.visible = true;
   }
 
@@ -92,10 +93,32 @@ export class ApplicantsComponent implements OnInit {
     this.visible = true;
   }
 
-  close(data: applicantReponse | undefined) {
+  close(
+    data: { data: applicantReponse; mode: 'create' | 'update' } | undefined
+  ) {
     this.visible = false;
     if (data) {
-      this.applicants.update((values) => [data, ...values]);
+      if (data.mode === 'create') {
+        this.applicants.update((values) => [data.data, ...values]);
+      } else {
+        this.applicants.update((val) => {
+          const index = val.findIndex((el) => el._id === data.data._id);
+          val[index] = { ...data.data };
+          return [...val];
+        });
+      }
     }
+  }
+
+  acepp(applicant: applicantReponse) {
+    this.aceptApplincat = true;
+    this.FormApplicant.patchValue(applicant)
+  }
+
+  
+
+  closeAcept() {
+    this.applicant = undefined;
+    this.aceptApplincat = false;
   }
 }
