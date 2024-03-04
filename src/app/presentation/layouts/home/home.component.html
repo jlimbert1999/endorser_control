@@ -1,4 +1,20 @@
-<div class="card">
-  <p-menubar [model]="items"></p-menubar>
-</div>
-<router-outlet></router-outlet>
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav
+    #drawer
+    class="sidenav"
+    fixedInViewport
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="(isHandset$ | async) === false"
+  >
+    <mat-toolbar>Menu</mat-toolbar>
+    <mat-nav-list>
+      <a mat-list-item routerLink="organizations">Organizaciones</a>
+      <a mat-list-item routerLink="endorsers">Avales</a>
+      <a mat-list-item routerLink="applicants">Postulantes</a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

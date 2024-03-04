@@ -22,48 +22,52 @@ import {
   endorserResponse,
 } from '../../../../infrastructure/interfaces';
 import { ApplicantService, EndorserService } from '../../../services';
+import { MaterialModule } from '../../../../material.module';
+import { ServerSelectSearchComponent } from '../../../components/server-select-search/server-select-search.component';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
+interface SelectOption {
+  value: endorserResponse;
+  text: string;
+}
 @Component({
   selector: 'applicant',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, PrimengModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    PrimengModule,
+    MaterialModule,
+    ServerSelectSearchComponent,
+  ],
   templateUrl: './applicant.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApplicantComponent implements OnInit {
-  id: string | undefined = undefined;
-  @Input() visible = false;
-  @Input() set applicant(val: applicantReponse | undefined) {
-    if (val) this.id = val._id;
-    const { endorsers, ...props } = val ?? {};
-    this.FormApplicant.patchValue(props);
-    if (endorsers) {
-      this.selectedEndorsers = endorsers;
-    }
-  }
-
-  @Output() close: EventEmitter<
-    { data: applicantReponse; mode: 'create' | 'update' } | undefined
-  > = new EventEmitter();
-
   private fb = inject(FormBuilder);
   private endorserService = inject(EndorserService);
   private applicantService = inject(ApplicantService);
 
-  endorsers = signal<endorserResponse[]>([]);
+  public applicant: applicantReponse | undefined = inject(MAT_DIALOG_DATA);
+  private dialogRef = inject(MatDialogRef<ApplicantComponent>);
+
+  endorsers = signal<SelectOption[]>([]);
   selectedEndorsers: endorserResponse[] = [];
   FormApplicant = this.fb.group({
     firstname: ['', [Validators.required]],
     middlename: ['', [Validators.required]],
-    lastname: ['', [Validators.required]],
+    lastname: [''],
     dni: ['', [Validators.required]],
-    professional_profile: ['', [Validators.required]],
+    professional_profile: [''],
     candidate_for: [''],
   });
 
   ngOnInit(): void {
-    console.log(this.applicant);
     this.FormApplicant.patchValue(this.applicant ?? {});
+    if (this.applicant) {
+      this.selectedEndorsers = this.applicant.endorsers;
+    }
   }
 
   searchEndorsers(term: string) {
@@ -71,36 +75,40 @@ export class ApplicantComponent implements OnInit {
       .searchAvailables(term)
       .pipe(debounceTime(300))
       .subscribe((endorsers) => {
-        this.endorsers.set(endorsers);
+        this.endorsers.set(
+          endorsers.map((el) => ({ value: el, text: el.name }))
+        );
       });
+  }
+  setEndorser(value: endorserResponse) {
+    const exist = this.selectedEndorsers.some((el) => el._id === value._id);
+    if (exist) return;
+    this.selectedEndorsers.push(value);
+  }
+
+  remove(value: endorserResponse) {
+    this.selectedEndorsers = this.selectedEndorsers.filter(
+      (el) => el._id !== value._id
+    );
   }
 
   save() {
-    if (this.id === undefined) {
+    if (!this.applicant) {
       this.applicantService
         .create(this.selectedEndorsers, this.FormApplicant.value)
         .subscribe((data) => {
-          this.FormApplicant.reset({});
-          this.selectedEndorsers = [];
-          this.endorsers.set([]);
-          this.close.emit({ data, mode: 'create' });
+          this.dialogRef.close(data);
         });
     } else {
       this.applicantService
-        .update(this.id, this.selectedEndorsers, this.FormApplicant.value)
+        .update(
+          this.applicant._id,
+          this.selectedEndorsers,
+          this.FormApplicant.value
+        )
         .subscribe((data) => {
-          this.FormApplicant.reset({});
-          this.selectedEndorsers = [];
-          this.endorsers.set([]);
-          this.close.emit({ data, mode: 'update' });
+          this.dialogRef.close(data);
         });
     }
-  }
-
-  cancel() {
-    this.FormApplicant.reset({});
-    this.selectedEndorsers = [];
-    this.endorsers.set([]);
-    this.close.emit(undefined);
   }
 }

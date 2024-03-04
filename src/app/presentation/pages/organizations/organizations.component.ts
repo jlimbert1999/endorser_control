@@ -3,8 +3,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
+  ViewChild,
   inject,
-  signal,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -12,15 +12,16 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
+import { MaterialModule } from '../../../material.module';
 import { organizationResponse } from '../../../infrastructure/interfaces';
 import { OrganizationService } from '../../services';
-import { PrimengModule } from '../../../primeng.module';
 
 @Component({
   selector: 'app-organizations',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, PrimengModule],
+  imports: [CommonModule, ReactiveFormsModule, MaterialModule],
   templateUrl: './organizations.component.html',
   styleUrl: './organizations.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,19 +30,33 @@ export class OrganizationsComponent implements OnInit {
   private organizationService = inject(OrganizationService);
   private fb = inject(FormBuilder);
 
-  datasource = signal<organizationResponse[]>([]);
-  visible: boolean = false;
+  displayedColumns: string[] = ['name', 'options'];
+  dataSource!: MatTableDataSource<organizationResponse>;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
   Form: FormGroup = this.fb.nonNullable.group({
     name: ['', Validators.required],
   });
+
+  constructor() {}
 
   ngOnInit(): void {
     this.getData();
   }
 
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
   getData() {
     this.organizationService.findAll().subscribe((resp) => {
-      this.datasource.set(resp.organizations);
+      console.log(resp.organizations);
+      this.dataSource = new MatTableDataSource(resp.organizations);
+      this.dataSource.paginator = this.paginator;
     });
   }
 
@@ -49,19 +64,9 @@ export class OrganizationsComponent implements OnInit {
     this.organizationService
       .create(this.Form.value)
       .subscribe((organization) => {
-        this.datasource.update((values) => {
-          this.closeDialog();
-          return [organization, ...values];
-        });
+        // this.datasource.update((values) => {
+        //   return [organization, ...values];
+        // });
       });
-  }
-
-  closeDialog() {
-    this.visible = false;
-    this.Form.reset({});
-  }
-
-  create() {
-    this.visible = true;
   }
 }

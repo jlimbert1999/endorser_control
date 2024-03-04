@@ -1,39 +1,37 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { MenuItem } from 'primeng/api';
-import { MenubarModule } from 'primeng/menubar';
+import { Component, inject } from '@angular/core';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { AsyncPipe } from '@angular/common';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+import { MatIconModule } from '@angular/material/icon';
+import { Observable } from 'rxjs';
+import { map, shareReplay } from 'rxjs/operators';
+import { RouterModule } from '@angular/router';
+
 @Component({
   selector: 'app-home',
-  standalone: true,
-  imports: [CommonModule, MenubarModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [
+    MatToolbarModule,
+    MatButtonModule,
+    MatSidenavModule,
+    MatListModule,
+    MatIconModule,
+    AsyncPipe,
+    RouterModule,
+  ],
 })
 export class HomeComponent {
-  items: MenuItem[] | undefined;
+  private breakpointObserver = inject(BreakpointObserver);
 
-  ngOnInit() {
-    this.items = [
-      {
-        label: 'Organizaciones',
-        icon: 'pi pi-fw pi-list',
-        routerLink: 'organizations',
-      },
-      {
-        label: 'Avales',
-        icon: 'pi pi-fw pi-id-card',
-        routerLink: 'endorsers',
-      },
-      {
-        label: 'Postulantes',
-        icon: 'pi pi-fw pi-users',
-        routerLink: 'applicants',
-      },
-      {
-        label: 'Aceptados',
-        icon: 'pi pi-fw pi-list',
-      },
-    ];
-  }
+  isHandset$: Observable<boolean> = this.breakpointObserver
+    .observe(Breakpoints.Handset)
+    .pipe(
+      map((result) => result.matches),
+      shareReplay()
+    );
 }

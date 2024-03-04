@@ -1,84 +1,70 @@
-<p-dialog
-  header="Registro postulante"
-  [closable]="false"
-  [visible]="visible"
-  [modal]="true"
-  [style]="{ width: '60vw' }"
-  [draggable]="false"
-  [resizable]="false"
-  styleClass="p-fluid"
->
-  <ng-template pTemplate="content">
-    <form [formGroup]="FormApplicant">
-      <div class="formgrid grid">
-        <div class="field col-12 md:col-4">
-          <label for="name">Nombre </label>
-          <input id="name" type="text" pInputText formControlName="firstname" />
-        </div>
-        <div class="field col-12 md:col-4">
-          <label for="name">Apellido paterno</label>
-          <input
-            id="name"
-            type="text"
-            pInputText
-            formControlName="middlename"
-          />
-        </div>
-        <div class="field col-12 md:col-4">
-          <label for="name">Apelldio materno</label>
-          <input id="name" type="text" pInputText formControlName="lastname" />
-        </div>
-        <div class="field col-12 md:col-2">
-          <label for="name">Nro. Carnet</label>
-          <input id="name" type="text" pInputText formControlName="dni" />
-        </div>
-        <div class="field col-12 md:col-4">
-          <label for="name">Perfil profesional</label>
-          <input
-            id="name"
-            type="text"
-            pInputText
-            formControlName="professional_profile"
-          />
-        </div>
-        <div class="field col-12 md:col-6">
-          <label for="name">Candidato a</label>
-          <input
-            id="name"
-            type="text"
-            pInputText
-            formControlName="candidate_for"
-          />
-        </div>
+<h2 mat-dialog-title>Registro aval</h2>
+<mat-dialog-content>
+  <form [formGroup]="FormApplicant">
+    <div class="row">
+      <div class="col-sm-4">
+        <mat-form-field>
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="firstname" required />
+        </mat-form-field>
       </div>
-    </form>
-    <p-autoComplete
-      [(ngModel)]="selectedEndorsers"
-      [forceSelection]="true"
-      [multiple]="true"
-      [suggestions]="endorsers()"
-      (completeMethod)="searchEndorsers($event.query)"
-      appendTo="body"
-      field="name"
-      placeholder="Buscar aval"
-    ></p-autoComplete>
-    <span class="p-fluid"> </span>
-  </ng-template>
-
-  <ng-template pTemplate="footer">
-    <button
-      pButton
-      pRipple
-      label="Cancelar"
-      class="p-button-text"
-      (click)="cancel()"
-    ></button>
-    <button
-      pButton
-      pRipple
-      label="Guardar"
-      [disabled]="FormApplicant.invalid"
-      (click)="save()"
-    ></button>
-  </ng-template>
-</p-dialog>
+      <div class="col-sm-4">
+        <mat-form-field>
+          <mat-label>Apelldio paterno</mat-label>
+          <input matInput formControlName="middlename" required />
+        </mat-form-field>
+      </div>
+      <div class="col-sm-4">
+        <mat-form-field>
+          <mat-label>Apellido materno</mat-label>
+          <input matInput formControlName="lastname"  />
+        </mat-form-field>
+      </div>
+      <div class="col-sm-3">
+        <mat-form-field>
+          <mat-label>Nro. Carnet</mat-label>
+          <input matInput formControlName="dni" />
+        </mat-form-field>
+      </div>
+      <div class="col-sm-4">
+        <mat-form-field>
+          <mat-label>Perfil profesional</mat-label>
+          <input matInput formControlName="professional_profile" />
+        </mat-form-field>
+      </div>
+      <div class="col-sm-5">
+        <mat-form-field>
+          <mat-label>cantidato por</mat-label>
+          <input matInput formControlName="candidate_for" />
+        </mat-form-field>
+      </div>
+      <div class="col-12">
+        <server-select-search
+          placeholder="Buscar aval"
+          [data]="endorsers()"
+          (onSearch)="searchEndorsers($event)"
+          (onSelect)="setEndorser($event)"
+        ></server-select-search>
+      </div>
+      <mat-nav-list>
+        <div mat-subheader>Listado de avales</div>
+        @for (link of selectedEndorsers; track link) {
+        <mat-list-item>
+          <div matListItemTitle href="...">{{ link.name }}</div>
+          <button mat-icon-button matListItemMeta (click)="remove(link)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-list-item>
+        } @empty {
+        <p class="text-center">Sin avales</p>
+        }
+      </mat-nav-list>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-button [disabled]="FormApplicant.invalid" (click)="save()">
+    Aceptar
+  </button>
+</mat-dialog-actions>

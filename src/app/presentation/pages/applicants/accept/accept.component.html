@@ -1,0 +1,87 @@
+<h2 mat-dialog-title>Aceptar postulante</h2>
+<mat-dialog-content>
+  <form>
+    <fieldset>
+      <div class="row mb-3">
+        <div class="col-sm-8">
+          <label for="disabledTextInput" class="form-label"
+            >Nombre completo</label
+          >
+          <input
+            type="text"
+            id="disabledTextInput"
+            class="form-control"
+            placeholder="Disabled input"
+            [value]="
+              applicant.firstname +
+                ' ' +
+                applicant.middlename +
+                ' ' +
+                applicant.lastname ??
+              ''
+            "
+            readonly
+          />
+        </div>
+        <div class="col-sm-4">
+          <label for="disabledTextInput" class="form-label"
+            >Nombre completo</label
+          >
+          <input
+            type="text"
+            id="disabledTextInput"
+            class="form-control"
+            placeholder="Disabled input"
+            [value]="applicant.dni"
+            readonly
+          />
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-sm-6">
+          <label for="disabledTextInput" class="form-label"
+            >Perfil profesional</label
+          >
+          <input
+            type="text"
+            id="disabledTextInput"
+            class="form-control"
+            [value]="applicant.professional_profile"
+            readonly
+          />
+        </div>
+        <div class="col-sm-6">
+          <label for="disabledTextInput" class="form-label">Candidato a</label>
+          <input
+            type="text"
+            id="disabledTextInput"
+            class="form-control"
+            [value]="applicant.candidate_for"
+            readonly
+          />
+        </div>
+      </div>
+      <div class="row p-3">
+        Listado de Avales
+        <ul class="list-group list-group-numbered">
+          @for (endo of applicant.endorsers; track $index;) {
+          <li class="list-group-item fw-bold">
+            {{ endo.name | uppercase }}
+          </li>
+          }
+        </ul>
+      </div>
+    </fieldset>
+  </form>
+
+  <server-select-search
+    placeholder="Seleccionar cargo"
+    [data]="jobs()"
+    (onSearch)="seaarchJobs($event)"
+    (onSelect)="setJob($event)"
+  ></server-select-search>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-button [disabled]="!id_job" (click)="acept()">Aceptar</button>
+</mat-dialog-actions>

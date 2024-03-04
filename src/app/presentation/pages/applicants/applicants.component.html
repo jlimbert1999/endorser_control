@@ -1,200 +1,152 @@
-<div class="card mt-2">
-  <p-toolbar styleClass="mb-4 gap-2">
-    <ng-template pTemplate="left">
-      <button
-        pButton
-        pRipple
-        label="Nuevo"
-        icon="pi pi-plus"
-        class="p-button-success mr-2"
-        (click)="news()"
-      ></button>
-    </ng-template>
-    <ng-template pTemplate="right">
-      <button
-        pButton
-        pRipple
-        label="Cargar"
-        icon="pi pi-upload"
-        (click)="loadExcelFile()"
-      ></button>
-    </ng-template>
-  </p-toolbar>
-  <div class="p-2">
-    <p-table
-      #dt
-      [value]="applicants()"
-      [rows]="10"
-      [paginator]="true"
-      [tableStyle]="{ 'min-width': '75rem' }"
-      [rowHover]="true"
-      currentPageReportTemplate=" {first} de {last} para {totalRecords}"
-      [showCurrentPageReport]="true"
-    >
-      <ng-template pTemplate="caption">
-        <div class="flex align-items-center justify-content-between">
-          <h5 class="m-0">Listado de aplicantes</h5>
-          <span class="p-input-icon-left">
-            <i class="pi pi-search"></i>
-            <input
-              pInputText
-              type="text"
-              (input)="dt.filterGlobal($event.target, 'contains')"
-              placeholder="Buscar aplicante"
-            />
-          </span>
-        </div>
-      </ng-template>
-      <ng-template pTemplate="header">
-        <tr>
-          <th>Nombre completo</th>
-          <th>CI</th>
-          <th>Perfil profesional</th>
-          <th>Candidato por</th>
-          <th>Aval</th>
-          <th></th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-product>
-        <tr>
-          <td>
-            {{ product.firstname | titlecase }}
-            {{ product.middlename | titlecase }}
-            {{ product.lastname | titlecase }}
-          </td>
-          <td>{{ product.dni }}</td>
-          <td>{{ product.professional_profile }}</td>
-          <td>{{ product.candidate_for | uppercase }}</td>
-          <td>
-            <ul>
-              @for (item of product.endorsers; track $index) {
-              <li>{{ item.name }}</li>
-              } @empty {
-              <li style="color: red">SIN AVAL</li>
-              }
-            </ul>
-          </td>
-          <td>
-            <button
-              pButton
-              pRipple
-              icon="pi pi-pencil"
-              class="p-button-rounded p-button-success mr-2"
-              (click)="edit(product)"
-            ></button>
-            <button
-              pButton
-              pRipple
-              icon="pi pi-check"
-              class="p-button-rounded p-button-warning"
-              (click)="acepp(product)"
-            ></button>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
+<mat-toolbar color="primary">
+  <span>Avales</span>
+  <span class="toolbar-spacer"></span>
+
+  <button
+    mat-icon-button
+    [matMenuTriggerFor]="menu"
+    aria-label="Example icon-button with a menu"
+  >
+    <mat-icon>widgets</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="add()">
+      <mat-icon>add</mat-icon>
+      <span>Agregar postulante</span>
+    </button>
+    <button mat-menu-item (click)="loadExcelFile()">
+      <mat-icon>upload</mat-icon>
+      <span>Cargar postulantes</span>
+    </button>
+    <button mat-menu-item (click)="loadOfficial()">
+      <mat-icon>upload</mat-icon>
+      <span>Cargar planilla</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>
+<div style="padding: 10px">
+  <mat-form-field>
+    <mat-label>Buscar aval</mat-label>
+    <input
+      matInput
+      (keyup)="applyFilter($event)"
+      placeholder="Nombre de la organizacion"
+      #input
+    />
+  </mat-form-field>
+
+  <div class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" matSort>
+      <ng-container matColumnDef="fullname">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          Nombre completo
+        </th>
+        <td mat-cell *matCellDef="let row" style="font-weight: bold">
+          {{ row.firstname | uppercase }} {{ row.middlename | uppercase }}
+          {{ row.lastname | uppercase }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="dni">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>DNI</th>
+        <td mat-cell *matCellDef="let row">
+          {{ row.dni }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="profile">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          Perfil profesional
+        </th>
+        <td mat-cell *matCellDef="let row">
+          {{ row.professional_profile | uppercase }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="candidate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Candidato por</th>
+        <td mat-cell *matCellDef="let row">
+          {{ row.candidate_for === "" ? "-----" : row.candidate_for }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="endorsers">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Avales</th>
+        <td mat-cell *matCellDef="let row">
+          <ul>
+            @for (item of row.endorsers; track $index) {
+            <li>{{ item.name }}</li>
+            } @empty {
+            <li style="color: red">SIN AVAL</li>
+            }
+          </ul>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="options">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+        <td mat-cell *matCellDef="let row">
+          <button
+            mat-icon-button
+            [matMenuTriggerFor]="menu"
+            aria-label="Example icon-button with a menu"
+          >
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="edit(row)">
+              <mat-icon>edit</mat-icon>
+              <span>Editar postulante</span>
+            </button>
+            <button mat-menu-item (click)="acept(row)">
+              <mat-icon>check_circle</mat-icon>
+              <span>Aceptar postulante</span>
+            </button>
+          </mat-menu>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="2" style="padding: 10px">
+          Sin resultados para: "{{ input.value }}"
+        </td>
+      </tr>
+    </table>
+
+    <mat-paginator
+      [pageSizeOptions]="[10, 25, 100]"
+      aria-label="Select page of users"
+    ></mat-paginator>
   </div>
 </div>
-<applicant
-  [visible]="visible"
-  [applicant]="applicant"
-  (close)="close($event)"
-></applicant>
 
-<p-dialog
-  header="Aceptar postulante"
-  (onHide)="closeAcept()"
-  [(visible)]="aceptApplincat"
+<!-- <p-dialog
+  header="Avalados"
+  [(visible)]="dialogDetail"
   [modal]="true"
-  [style]="{ width: '60vw' }"
   [draggable]="false"
   [resizable]="false"
-  styleClass="p-fluid"
+  [style]="{ width: '900px' }"
 >
-  <ng-template pTemplate="content">
-    <form [formGroup]="FormApplicant">
-      <div class="formgrid grid">
-        <div class="field col-12 md:col-4">
-          <label for="name">Nombre </label>
-          <input
-            readonly
-            id="name"
-            type="text"
-            pInputText
-            formControlName="firstname"
-          />
-        </div>
-        <div class="field col-12 md:col-4">
-          <label for="name">Apellido paterno</label>
-          <input
-            readonly
-            id="name"
-            type="text"
-            pInputText
-            formControlName="middlename"
-          />
-        </div>
-        <div class="field col-12 md:col-4">
-          <label for="name">Apelldio materno</label>
-          <input
-            readonly
-            id="name"
-            type="text"
-            pInputText
-            formControlName="lastname"
-          />
-        </div>
-        <div class="field col-12 md:col-2">
-          <label for="name">Nro. Carnet</label>
-          <input
-            readonly
-            id="name"
-            type="text"
-            pInputText
-            formControlName="dni"
-          />
-        </div>
-        <div class="field col-12 md:col-4">
-          <label for="name">Perfil profesional</label>
-          <input
-            readonly
-            id="name"
-            type="text"
-            pInputText
-            formControlName="professional_profile"
-          />
-        </div>
-        <div class="field col-12 md:col-6">
-          <label for="name">Candidato a</label>
-          <input
-            id="name"
-            type="text"
-            pInputText
-            formControlName="candidate_for"
-          />
-        </div>
-      </div>
-    </form>
-    <p-autoComplete
-      [(ngModel)]="selectedEndorsers"
-      [forceSelection]="true"
-      [multiple]="true"
-      [suggestions]="endorsers()"
-      (completeMethod)="searchEndorsers($event.query)"
-      appendTo="body"
-      field="name"
-      placeholder="Buscar cargo"
-    ></p-autoComplete>
-    <span class="p-fluid"> </span>
-  </ng-template>
-
-  <ng-template pTemplate="footer">
-    <button
-      pButton
-      pRipple
-      label="Guardar"
-      [disabled]="FormApplicant.invalid"
-      (click)="save()"
-    ></button>
-  </ng-template>
-</p-dialog>
+  @if (applicants.length>0) {
+  <p-table [value]="applicants" [tableStyle]="{ 'min-width': '50rem' }">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Nro</th>
+        <th>Nombre</th>
+        <th>CI</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-product let-rowIndex="rowIndex">
+      <tr>
+        <td>{{ rowIndex + 1 }}</td>
+        <td>
+          {{ product.firstname }} {{ product.middlename }}
+          {{ product.lastname }}
+        </td>
+        <td>{{ product.dni }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+  } @else {
+  <p>Sin avalados</p>
+  }
+</p-dialog> -->
