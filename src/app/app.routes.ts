@@ -10,9 +10,17 @@ export const routes: Routes = [
     path: '',
     component: HomeComponent,
     children: [
-      { path: 'applicants', component: ApplicantsComponent },
-      { path: 'endorsers', component: EndorsersComponent },
-      { path: 'organizations', component: OrganizationsComponent },
+      {
+        path: 'applicants',
+        component: ApplicantsComponent,
+        title: 'Postulantes',
+      },
+      { path: 'endorsers', component: EndorsersComponent, title: 'Avales' },
+      {
+        path: 'organizations',
+        component: OrganizationsComponent,
+        title: 'Organizaciones',
+      },
     ],
   },
 ];

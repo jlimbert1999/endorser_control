@@ -3,7 +3,7 @@
 }
 
 .sidenav {
-  width: 200px;
+  width: 250px;
 }
 
 .sidenav .mat-toolbar {
@@ -15,6 +15,11 @@
   top: 0;
   z-index: 1;
 }
-.container{
+
+.container {
   padding: 20px;
+}
+
+.active {
+  background-color: #BBDEFB;
 }

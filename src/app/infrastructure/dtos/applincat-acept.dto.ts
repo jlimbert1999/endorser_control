@@ -1,7 +1,8 @@
+import { Applicant } from '../../domain/models/applicant.model';
 import { applicantReponse, endorserResponse } from '../interfaces';
 
 export class AcceptApplicantDto {
-  static fromForm(form: applicantReponse, id_job: string) {
+  static fromForm(form: Applicant, id_job: string) {
     return new AcceptApplicantDto(
       form['firstname'],
       form['middlename'],

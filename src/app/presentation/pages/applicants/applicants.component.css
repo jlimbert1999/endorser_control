@@ -1,3 +1,7 @@
-:host {
-  display: block;
+.mat-mdc-cell {
+  font-size: 12px;
+}
+
+.mat-column-endorsers {
+  width: 30%;
 }

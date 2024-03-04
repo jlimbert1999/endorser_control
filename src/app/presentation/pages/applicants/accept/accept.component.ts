@@ -6,10 +6,10 @@ import {
   signal,
 } from '@angular/core';
 import { MaterialModule } from '../../../../material.module';
-import { applicantReponse } from '../../../../infrastructure/interfaces';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ApplicantService } from '../../../services';
 import { ServerSelectSearchComponent } from '../../../components/server-select-search/server-select-search.component';
+import { Applicant } from '../../../../domain/models/applicant.model';
 
 interface SelectOption {
   value: string;
@@ -24,7 +24,7 @@ interface SelectOption {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AcceptComponent {
-  public applicant: applicantReponse = inject(MAT_DIALOG_DATA);
+  public applicant: Applicant = inject(MAT_DIALOG_DATA);
   public applicantService = inject(ApplicantService);
   jobs = signal<SelectOption[]>([]);
   id_job: string | undefined = undefined;

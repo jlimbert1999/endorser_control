@@ -34,6 +34,14 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { AcceptComponent } from './accept/accept.component';
+import {
+  animate,
+  state,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
+import { Applicant } from '../../../domain/models/applicant.model';
 @Component({
   selector: 'app-applicants',
   standalone: true,
@@ -52,6 +60,15 @@ import { AcceptComponent } from './accept/accept.component';
   styleUrl: './applicants.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [DialogService, MaterialModule],
+  animations: [
+    trigger('fadeInOut', [
+      state('in', style({ opacity: 1 })),
+      transition(':enter', [animate('0.5s ease-in-out')]),
+      transition(':leave', [
+        animate('0.5s ease-in-out', style({ opacity: 0 })),
+      ]),
+    ]),
+  ],
 })
 export class ApplicantsComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -73,7 +90,7 @@ export class ApplicantsComponent implements OnInit {
     'endorsers',
     'options',
   ];
-  dataSource!: MatTableDataSource<applicantReponse>;
+  dataSource!: MatTableDataSource<Applicant>;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   ngOnInit(): void {
@@ -123,6 +140,7 @@ export class ApplicantsComponent implements OnInit {
     const dialogRef = this.dialog.open(AcceptComponent, {
       data: applicant,
       width: '1000px',
+      autoFocus: false,
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (!result) return;
