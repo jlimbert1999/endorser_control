@@ -32,7 +32,12 @@ export class AcceptComponent {
 
   seaarchJobs(term: string) {
     this.applicantService.searchjobs(term).subscribe((data) => {
-      this.jobs.set(data.map((el) => ({ value: el._id, text: el.nombre })));
+      this.jobs.set(
+        data.map((el) => ({
+          value: el._id,
+          text: `${el.contract} - ${el.name}`,
+        }))
+      );
     });
   }
 

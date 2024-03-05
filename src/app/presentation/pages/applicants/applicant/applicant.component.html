@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Registro aval</h2>
+<h2 mat-dialog-title>{{ applicant ? "Edicion" : "Registro" }} postulante</h2>
 <mat-dialog-content>
   <form [formGroup]="FormApplicant">
     <div class="row">
@@ -17,7 +17,7 @@
       <div class="col-sm-4">
         <mat-form-field>
           <mat-label>Apellido materno</mat-label>
-          <input matInput formControlName="lastname"  />
+          <input matInput formControlName="lastname" />
         </mat-form-field>
       </div>
       <div class="col-sm-3">

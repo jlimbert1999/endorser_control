@@ -1,0 +1,29 @@
+<h1 mat-dialog-title>Edicion documentacion</h1>
+<mat-dialog-content>
+  <dl class="row">
+    <dt class="col-sm-3">Postulante:</dt>
+    <dd class="col-sm-9">{{ applicant.fullname }}</dd>
+
+    <dt class="col-sm-3">Carnet:</dt>
+    <dd class="col-sm-9">
+      {{ applicant.dni }}
+    </dd>
+
+    <dt class="col-sm-3">Perfil profesional:</dt>
+    <dd class="col-sm-9">
+      {{ applicant.professional_profile }}
+    </dd>
+  </dl>
+  <hr />
+  <mat-selection-list #shoes [(ngModel)]="selectedDocuments">
+    <div mat-subheader>Documentos presentados</div>
+    @for (document of documents; track document) {
+    <mat-list-option [value]="document">{{ document }}</mat-list-option>
+    <mat-divider />
+    }
+  </mat-selection-list>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="">Cancelar</button>
+  <button mat-button (click)="update()">Aceptar</button>
+</mat-dialog-actions>

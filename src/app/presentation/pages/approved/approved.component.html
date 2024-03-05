@@ -1,0 +1,133 @@
+<div class="animate__animated animate__fadeIn animate__faster">
+  <mat-toolbar color="primary">
+    <span>Aprobados</span>
+    <span class="toolbar-spacer"></span>
+  </mat-toolbar>
+  <div style="padding: 10px">
+    <mat-form-field>
+      <mat-label>Buscar aprobado</mat-label>
+      <input
+        #inputsearch
+        matInput
+        (keydown.enter)="applyFilter(inputsearch.value)"
+        placeholder="Nombre / Carnet"
+      />
+    </mat-form-field>
+
+    <div class="mat-elevation-z8">
+      <table mat-table [dataSource]="datasource()">
+        <ng-container matColumnDef="fullname">
+          <th mat-header-cell *matHeaderCellDef>Nombre</th>
+          <td mat-cell *matCellDef="let row">
+            {{ row.fullname | uppercase }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="dni">
+          <th mat-header-cell *matHeaderCellDef>CI</th>
+          <td mat-cell *matCellDef="let row">
+            {{ row.dni }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="profile">
+          <th mat-header-cell *matHeaderCellDef>Perfil profesional</th>
+          <td mat-cell *matCellDef="let row">
+            {{ row.professional_profile | uppercase }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="candidate">
+          <th mat-header-cell *matHeaderCellDef>Candidato por</th>
+          <td mat-cell *matCellDef="let row">
+            {{ row.candidate_for === "" ? "-----" : row.candidate_for }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="endorsers">
+          <th mat-header-cell *matHeaderCellDef>Avales</th>
+          <td mat-cell *matCellDef="let row">
+            <ul class="p-2">
+              @for (item of row.endorsers; track $index) {
+              <li>{{ item.name | uppercase }}</li>
+              } @empty {
+              <li style="color: red">SIN AVAL</li>
+              }
+            </ul>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="dj">
+          <th mat-header-cell *matHeaderCellDef>DJ.</th>
+          <td mat-cell *matCellDef="let row">
+            @if(row.haveFile(file.DJ)){
+            <mat-icon fontIcon="check" style="color: green" />
+            } @else { <mat-icon fontIcon="close" style="color: red" /> }
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="rj">
+          <th mat-header-cell *matHeaderCellDef>RJ.</th>
+          <td mat-cell *matCellDef="let row">
+            @if(row.haveFile(file.RJ)){
+            <mat-icon fontIcon="check" style="color: green" />
+            } @else { <mat-icon fontIcon="close" style="color: red" /> }
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="s">
+          <th mat-header-cell *matHeaderCellDef>S.</th>
+          <td mat-cell *matCellDef="let row">
+            @if(row.haveFile(file.S)){
+            <mat-icon fontIcon="check" style="color: green" />
+            } @else { <mat-icon fontIcon="close" style="color: red" /> }
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="af">
+          <th mat-header-cell *matHeaderCellDef>AF.</th>
+          <td mat-cell *matCellDef="let row">
+            @if(row.haveFile(file.AF)){
+            <mat-icon fontIcon="check" style="color: green" />
+            } @else { <mat-icon fontIcon="close" style="color: red" /> }
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="options">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let row">
+            <button
+              mat-icon-button
+              [matMenuTriggerFor]="menu"
+              aria-label="Example icon-button with a menu"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="update(row)">
+                <mat-icon>edit</mat-icon>
+                <span>Editar documentos</span>
+              </button>
+              <button mat-menu-item (click)="accept(row)">
+                <mat-icon>how_to_reg</mat-icon>
+                <span>Aprobar ingreso</span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: columns"
+          [class.is-done]="row.isEnabled()"
+        ></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="2" style="padding: 10px">
+            Sin resultados para:
+          </td>
+        </tr>
+      </table>
+
+      <paginator
+        (onPageChage)="changePage($event)"
+        [length]="datasize()"
+        [index]="index()"
+        [limit]="limit()"
+      />
+    </div>
+  </div>
+</div>

@@ -1,3 +1,4 @@
+import { ApplicantDocument } from '../../domain/interfaces/applicant-document.enum';
 import { endorserResponse } from './endorser-response.interface';
 
 export interface applicantReponse {
@@ -9,4 +10,5 @@ export interface applicantReponse {
   professional_profile: string;
   candidate_for: string;
   endorsers: endorserResponse[];
+  documents: ApplicantDocument[];
 }

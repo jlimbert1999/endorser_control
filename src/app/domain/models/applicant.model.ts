@@ -1,4 +1,5 @@
 import { applicantReponse } from '../../infrastructure/interfaces';
+import { ApplicantDocument } from '../interfaces/applicant-document.enum';
 
 interface aplicantProps {
   _id: string;
@@ -9,7 +10,9 @@ interface aplicantProps {
   candidate_for: string;
   professional_profile: string;
   endorsers: endorser[];
+  documents: ApplicantDocument[];
 }
+
 interface endorser {
   name: string;
   organization: string;
@@ -23,6 +26,7 @@ export class Applicant {
   candidate_for: string;
   professional_profile: string;
   endorsers: endorser[];
+  documents: ApplicantDocument[];
 
   static fromResponse(response: applicantReponse) {
     return new Applicant({
@@ -34,6 +38,7 @@ export class Applicant {
       candidate_for: response.candidate_for,
       professional_profile: response.professional_profile,
       endorsers: response.endorsers,
+      documents: response.documents,
     });
   }
 
@@ -46,6 +51,7 @@ export class Applicant {
     professional_profile,
     endorsers,
     dni,
+    documents,
   }: aplicantProps) {
     this._id = _id;
     this.firstname = firstname;
@@ -55,9 +61,19 @@ export class Applicant {
     this.candidate_for = candidate_for;
     this.professional_profile = professional_profile;
     this.endorsers = endorsers;
+    this.documents = documents;
   }
 
   get fullname() {
     return `${this.firstname} ${this.middlename} ${this.lastname}`;
+  }
+
+  haveFile(document: ApplicantDocument) {
+    return this.documents.includes(document);
+  }
+
+  isEnabled() {
+    const validDocuments = Object.values(ApplicantDocument);
+    return validDocuments.every((el) => this.documents.includes(el));
   }
 }
