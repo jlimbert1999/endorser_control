@@ -5,8 +5,8 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { MaterialModule } from '../../../../material.module';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MaterialModule } from '../../../../material.module';
 import { ApplicantService } from '../../../services';
 import { ServerSelectSearchComponent } from '../../../components/server-select-search/server-select-search.component';
 import { Applicant } from '../../../../domain/models/applicant.model';

@@ -54,7 +54,6 @@ export class OrganizationsComponent implements OnInit {
 
   getData() {
     this.organizationService.findAll().subscribe((resp) => {
-      console.log(resp.organizations);
       this.dataSource = new MatTableDataSource(resp.organizations);
       this.dataSource.paginator = this.paginator;
     });

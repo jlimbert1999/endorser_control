@@ -16,7 +16,6 @@ import {
   Validators,
 } from '@angular/forms';
 import { debounceTime } from 'rxjs';
-import { PrimengModule } from '../../../../primeng.module';
 import {
   applicantReponse,
   endorserResponse,
@@ -37,7 +36,6 @@ interface SelectOption {
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    PrimengModule,
     MaterialModule,
     ServerSelectSearchComponent,
   ],

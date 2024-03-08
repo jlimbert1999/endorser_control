@@ -1,3 +1,4 @@
+import { Injectable } from '@angular/core';
 import Swal from 'sweetalert2';
 
 interface AlertOptions {
@@ -5,8 +6,20 @@ interface AlertOptions {
   text?: string;
   icon: 'success' | 'error' | 'warning' | 'info' | 'question';
 }
-export class Alert {
-  static Alert({ icon = 'info', title, text }: AlertOptions) {
+
+interface QuestionAlertOptions {
+  title: string;
+  text?: string;
+  callback: () => void;
+}
+
+@Injectable({
+  providedIn: 'root',
+})
+export class AlertService {
+  constructor() {}
+
+  Alert({ icon = 'info', title, text }: AlertOptions) {
     Swal.fire({
       icon,
       title,
@@ -14,14 +27,17 @@ export class Alert {
       confirmButtonText: 'Aceptar',
     });
   }
-  static QuestionAlert(title: string, subtitle: string, callback: () => void) {
+  QuestionAlert({ title, text, callback }: QuestionAlertOptions) {
     Swal.fire({
-      title,
-      text: subtitle,
+      title: title,
+      text: text,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Aceptar',
       cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#3F51B5',
+      cancelButtonColor: '#F44336',
+      reverseButtons:true
     }).then((result) => {
       if (result.isConfirmed) {
         callback();

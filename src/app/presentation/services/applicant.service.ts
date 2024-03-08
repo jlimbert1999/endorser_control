@@ -11,12 +11,39 @@ import { AcceptApplicantDto } from '../../infrastructure/dtos/applincat-acept.dt
 import { map } from 'rxjs';
 import { Applicant } from '../../domain/models/applicant.model';
 
+type status = 'accepted' | 'pending';
+interface searchParams {
+  limit: number;
+  offset: number;
+  term: string;
+  status: status;
+}
 @Injectable({
   providedIn: 'root',
 })
 export class ApplicantService {
   private readonly url = `${environment.url}/applicants`;
   constructor(private http: HttpClient) {}
+
+  findAll(status: status, limit: number, offset: number) {
+    const params = new HttpParams({ fromObject: { limit, offset } });
+    return this.http
+      .get<{ applicants: applicantReponse[]; length: number }>(
+        `${this.url}/${status}`,
+        { params }
+      )
+      .pipe(map((resp) => this.responseToModels(resp)));
+  }
+
+  search({ limit, offset, term, status }: searchParams) {
+    const params = new HttpParams({ fromObject: { limit, offset } });
+    return this.http
+      .get<{ applicants: applicantReponse[]; length: number }>(
+        `${this.url}/search/${status}/${term}`,
+        { params }
+      )
+      .pipe(map((resp) => this.responseToModels(resp)));
+  }
 
   create(selectedEndorsers: endorserResponse[], form: Object) {
     const applicant = CreateApplicantDto.fromForm(selectedEndorsers, form);
@@ -25,7 +52,9 @@ export class ApplicantService {
 
   update(id: string, selectedEndorsers: endorserResponse[], form: Object) {
     const applicant = CreateApplicantDto.fromForm(selectedEndorsers, form);
-    return this.http.put<applicantReponse>(`${this.url}/${id}`, applicant);
+    return this.http
+      .put<applicantReponse>(`${this.url}/${id}`, applicant)
+      .pipe(map((resp) => Applicant.fromResponse(resp)));
   }
 
   updateDocuments(id: string, documents: string[]) {
@@ -38,54 +67,24 @@ export class ApplicantService {
     return this.http.post<applicantReponse>(`${this.url}/upload`, data);
   }
 
-  findAll(limit: number, offset: number) {
-    const params = new HttpParams({ fromObject: { limit, offset } });
-    return this.http
-      .get<{ applicants: applicantReponse[]; length: number }>(`${this.url}`, {
-        params,
-      })
-      .pipe(map((resp) => this.responseToModels(resp)));
-  }
-
-  getApproved(limit: number, offset: number) {
-    const params = new HttpParams({ fromObject: { limit, offset } });
-    return this.http
-      .get<{ applicants: applicantReponse[]; length: number }>(
-        `${this.url}/approved`,
-        {
-          params,
-        }
-      )
-      .pipe(map((resp) => this.responseToModels(resp)));
-  }
-  search(limit: number, offset: number, term: string) {
-    const params = new HttpParams({ fromObject: { limit, offset } });
-    return this.http
-      .get<{ applicants: applicantReponse[]; length: number }>(
-        `${this.url}/search/${term}`,
-        { params }
-      )
-      .pipe(map((resp) => this.responseToModels(resp)));
-  }
-
   searchjobs(term: string) {
     return this.http.get<chargeResponse[]>(`${this.url}/jobs/${term}`);
   }
 
   accept(data: Applicant, id_job: string) {
-    return this.http.post<any>(`${this.url}/accept/${data._id}`, { id_job });
-  }
-
-  approve(id_applicant: string) {
-    return this.http.put<{ message: string }>(
-      `${this.url}/approve/${id_applicant}`,
-      undefined
-    );
+    return this.http.post<boolean>(`${this.url}/accept/${data._id}`, { id_job });
   }
 
   getApplicantByEndorser(id_endorser: string) {
     return this.http.get<applicantReponse[]>(
       `${this.url}/endorser/${id_endorser}`
+    );
+  }
+
+  toggleAproved(id_applicant: string) {
+    return this.http.put<void>(
+      `${this.url}/approve/${id_applicant}`,
+      undefined
     );
   }
 

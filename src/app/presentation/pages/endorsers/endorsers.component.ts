@@ -17,7 +17,6 @@ import {
 } from '../../../infrastructure/interfaces';
 import { OrganizationService } from '../../services/organization.service';
 import { EndorserComponent } from './endorser/endorser.component';
-import { PrimengModule } from '../../../primeng.module';
 import { ApplicantService } from '../../services';
 import { MaterialModule } from '../../../material.module';
 import { MatTableDataSource } from '@angular/material/table';
@@ -31,7 +30,6 @@ import { DependentsComponent } from './dependents/dependents.component';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    PrimengModule,
     EndorserComponent,
     MaterialModule,
   ],
@@ -97,7 +95,6 @@ export class EndorsersComponent implements OnInit {
     return this.applicantService
       .getApplicantByEndorser(id_endorser)
       .subscribe((data) => {
-        console.log(data);
         this.applicants = data;
       });
   }

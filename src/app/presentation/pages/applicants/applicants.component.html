@@ -2,7 +2,6 @@
   <mat-toolbar color="primary">
     <span>Postulantes</span>
     <span class="toolbar-spacer"></span>
-
     <button
       mat-icon-button
       [matMenuTriggerFor]="menu"
@@ -23,13 +22,24 @@
   </mat-toolbar>
   <div style="padding: 10px">
     <mat-form-field>
-      <mat-label>Buscar aval</mat-label>
+      <mat-label>Buscar postulante</mat-label>
       <input
         #inputsearch
         matInput
+        [value]="term()"
         (keydown.enter)="applyFilter(inputsearch.value)"
         placeholder="Nombre de la organizacion"
       />
+      @if (term()) {
+      <button
+        matSuffix
+        mat-icon-button
+        aria-label="Clear"
+        (click)="cancelFilter()"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+      }
     </mat-form-field>
 
     <div class="mat-elevation-z8">
@@ -96,7 +106,7 @@
 
         <tr class="mat-row" *matNoDataRow>
           <td class="mat-cell" colspan="2" style="padding: 10px">
-            Sin resultados para:
+            No se encontraron resultados
           </td>
         </tr>
       </table>

@@ -24,7 +24,7 @@ export class OfficerUpdateComponent implements OnInit {
   private applicantService = inject(ApplicantService);
   public applicant: Applicant = inject(MAT_DIALOG_DATA);
 
-  documents: string[] = ['Declaracion jurada', 'Rejap', 'S', 'AF'];
+  documents: string[] = ['Declaracion jurada', 'REJAP', 'CENVI', 'Libreta de servicio militar'];
   selectedDocuments: string[] = [];
 
   ngOnInit(): void {
@@ -34,7 +34,6 @@ export class OfficerUpdateComponent implements OnInit {
     this.applicantService
       .updateDocuments(this.applicant._id, this.selectedDocuments)
       .subscribe((resp) => {
-        console.log(resp);
         this.dialogRef.close(resp);
       });
   }

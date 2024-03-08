@@ -27,6 +27,7 @@ export const routes: Routes = [
         component: OrganizationsComponent,
         title: 'Organizaciones',
       },
+      { path: '', pathMatch: 'full', redirectTo: 'applicants' },
     ],
   },
 ];

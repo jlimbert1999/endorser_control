@@ -4,7 +4,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
-import { loggingInterceptor } from '../core/interceptor';
+import { loggingInterceptor } from './core/interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
