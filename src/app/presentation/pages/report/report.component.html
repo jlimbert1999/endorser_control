@@ -1,0 +1,42 @@
+<mat-toolbar color="primary">
+  <span>Reporte</span>
+  <span class="toolbar-spacer"></span>
+</mat-toolbar>
+<div class="px-5 animate__animated animate__fadeIn animate__faster">
+  <div class="row mt-3">
+    <div class="col-2">
+      <mat-form-field>
+        <mat-label>Fecha de alta</mat-label>
+        <input
+          matInput
+          [matDatepicker]="picker"
+          [(ngModel)]="date"
+          (dateChange)="getData()"
+        />
+        <mat-datepicker-toggle
+          matIconSuffix
+          [for]="picker"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <div class="col-12">
+      <mat-list>
+        @for (applicant of applicants(); track applicant._id) {
+        <mat-list-item>
+          <mat-icon matListItemIcon>person</mat-icon>
+          <div matListItemTitle>
+            {{ applicant.fullname | uppercase }}
+          </div>
+          <div matListItemLine>{{ applicant.candidate_for | uppercase }}</div>
+          <div matListItemMeta>{{ applicant?.date | date : "short" }}</div>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+        } @empty {
+        <mat-list-item>SIN REGISTROS</mat-list-item>
+        }
+      </mat-list>
+    </div>
+  </div>
+</div>

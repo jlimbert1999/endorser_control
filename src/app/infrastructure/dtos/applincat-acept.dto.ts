@@ -1,5 +1,4 @@
 import { Applicant } from '../../domain/models/applicant.model';
-import { applicantReponse, endorserResponse } from '../interfaces';
 
 export class AcceptApplicantDto {
   static fromForm(form: Applicant, id_job: string) {

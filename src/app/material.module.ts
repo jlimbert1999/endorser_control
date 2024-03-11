@@ -14,6 +14,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 @NgModule({
   declarations: [],
   imports: [CommonModule],
@@ -31,7 +33,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatMenuModule,
     MatTooltipModule,
     MatCheckboxModule,
+    MatChipsModule,
     MatProgressSpinnerModule,
+    MatDatepickerModule
   ],
 })
 export class MaterialModule {}

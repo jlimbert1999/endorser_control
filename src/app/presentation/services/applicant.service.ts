@@ -25,6 +25,16 @@ export class ApplicantService {
   private readonly url = `${environment.url}/applicants`;
   constructor(private http: HttpClient) {}
 
+  getCompleted(date: Date, limit: number, offset: number) {
+    const params = new HttpParams({ fromObject: { limit, offset } });
+    return this.http
+      .get<{ applicants: applicantReponse[]; length: number }>(
+        `${this.url}/completed/${date.getTime()}`,
+        { params }
+      )
+      .pipe(map((resp) => this.responseToModels(resp)));
+  }
+
   findAll(status: status, limit: number, offset: number) {
     const params = new HttpParams({ fromObject: { limit, offset } });
     return this.http
@@ -71,8 +81,11 @@ export class ApplicantService {
     return this.http.get<chargeResponse[]>(`${this.url}/jobs/${term}`);
   }
 
-  accept(data: Applicant, id_job: string) {
-    return this.http.post<boolean>(`${this.url}/accept/${data._id}`, { id_job });
+  accept(data: Applicant, id_job: string, name: string) {
+    return this.http.post<boolean>(`${this.url}/accept/${data._id}`, {
+      id_job,
+      name,
+    });
   }
 
   getApplicantByEndorser(id_endorser: string) {

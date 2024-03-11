@@ -6,7 +6,12 @@ import {
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Observable, catchError, finalize, throwError } from 'rxjs';
-import { AlertService, ApparenceService } from '../presentation/services';
+import {
+  AlertService,
+  ApparenceService,
+  AuthService,
+} from '../presentation/services';
+import { Router } from '@angular/router';
 
 export function loggingInterceptor(
   req: HttpRequest<unknown>,
@@ -14,11 +19,24 @@ export function loggingInterceptor(
 ): Observable<HttpEvent<unknown>> {
   const apparecenService = inject(ApparenceService);
   const alertService = inject(AlertService);
+  const autService = inject(AuthService);
+  const router = inject(Router);
+  const reqWithHeader = req.clone({
+    headers: req.headers.append(
+      'Authorization',
+      `Bearer ${localStorage.getItem('token') || ''}`
+    ),
+  });
   apparecenService.showLoader();
-  return next(req).pipe(
+  return next(reqWithHeader).pipe(
     catchError((error) => {
       if (error instanceof HttpErrorResponse) {
-        handleHttpErrors(error, alertService);
+        if (error.status === 401) {
+          autService.logout();
+          router.navigate(['/login']);
+        } else {
+          handleHttpErrors(error, alertService);
+        }
       }
       console.error(error);
       return throwError(() => Error);
@@ -42,6 +60,13 @@ function handleHttpErrors(error: HttpErrorResponse, service: AlertService) {
         icon: 'error',
         title: 'Error en el servidor',
         text: 'Se ha producido un error en el servidor.',
+      });
+      break;
+    case 404:
+      service.Alert({
+        icon: 'info',
+        title: 'El recurso solicitado no existe',
+        text: `${error.url} no econtrado`,
       });
       break;
 

@@ -94,7 +94,7 @@ export class ApprovedComponent implements OnInit {
   accept(applicant: Applicant) {
     const dialogRef = this.dialog.open(AcceptComponent, {
       data: applicant,
-      width: '700px',
+      width: '800px',
       autoFocus: false,
     });
     dialogRef.afterClosed().subscribe((result) => {

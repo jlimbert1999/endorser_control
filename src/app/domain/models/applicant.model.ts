@@ -9,8 +9,10 @@ interface aplicantProps {
   dni: string;
   candidate_for: string;
   professional_profile: string;
+  phone: string;
   endorsers: endorser[];
   documents: ApplicantDocument[];
+  date?: Date;
 }
 
 interface endorser {
@@ -27,6 +29,8 @@ export class Applicant {
   professional_profile: string;
   endorsers: endorser[];
   documents: ApplicantDocument[];
+  phone: string;
+  date?: Date;
 
   static fromResponse(response: applicantReponse) {
     return new Applicant({
@@ -39,6 +43,8 @@ export class Applicant {
       professional_profile: response.professional_profile,
       endorsers: response.endorsers,
       documents: response.documents,
+      phone: response.phone,
+      date: response.date ? new Date(response.date) : undefined,
     });
   }
 
@@ -52,6 +58,8 @@ export class Applicant {
     endorsers,
     dni,
     documents,
+    phone,
+    date,
   }: aplicantProps) {
     this._id = _id;
     this.firstname = firstname;
@@ -62,10 +70,12 @@ export class Applicant {
     this.professional_profile = professional_profile;
     this.endorsers = endorsers;
     this.documents = documents;
+    this.phone = phone;
+    this.date = date;
   }
 
   get fullname() {
-    return `${this.firstname} ${this.middlename} ${this.lastname}`;
+    return `${this.firstname} ${this.middlename} ${this.lastname ?? ''}`;
   }
 
   haveFile(document: ApplicantDocument) {

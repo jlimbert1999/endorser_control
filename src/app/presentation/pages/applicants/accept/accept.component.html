@@ -19,12 +19,10 @@
       {{ applicant.candidate_for }}
     </dd>
   </dl>
-  <hr />
-  <div class="row mb-4">
-    <p class="fw-bold">Listado de avales</p>
+  <div class="row mb-3">
     <div class="col-12">
       <ul
-        class="list-group list-group-flush overflow-auto"
+        class="list-group list-group-flush overflow-auto list-group-numbered"
         style="max-height: 280px"
       >
         @for (item of applicant.endorsers; track $index) {
@@ -42,12 +40,7 @@
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-flat-button color="warn" mat-dialog-close>Cancelar</button>
-  <button
-    mat-flat-button
-    color="primary"
-    [disabled]="!id_job"
-    (click)="acept()"
-  >
+  <button mat-flat-button color="primary" [disabled]="!job" (click)="acept()">
     Aceptar
   </button>
 </mat-dialog-actions>

@@ -1,0 +1,42 @@
+<div class="container">
+  <div class="d-flex align-items-center vh-100 justify-content-center">
+    <div
+      class="animate__animated animate__fadeInDown shadow p-4 rounded-4"
+      style="width: 500px"
+    >
+      <form [formGroup]="Form">
+        <div class="row">
+          <div class="col-12">
+            <p class="mb-4">DOTACION DE PERSONAL</p>
+          </div>
+          <div class="col-12">
+            <mat-form-field>
+              <mat-label>Nombre de usuario </mat-label>
+              <input matInput formControlName="login" />
+            </mat-form-field>
+          </div>
+          <div class="col-12">
+            <mat-form-field>
+              <mat-label>Contraseña</mat-label>
+              <input matInput formControlName="password" />
+            </mat-form-field>
+          </div>
+          <div class="col-12">
+            <button
+              style="width: 100%"
+              mat-stroked-button
+              color="primary"
+              [disabled]="Form.invalid"
+              (click)="login()"
+            >
+              INGRESAR
+            </button>
+          </div>
+          <div class="col-12 mt-3">
+            <small>Módulo: V.1</small>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

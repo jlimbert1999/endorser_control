@@ -2,43 +2,34 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  EventEmitter,
-  Input,
+  DestroyRef,
+  ElementRef,
   OnInit,
-  Output,
+  ViewChild,
   inject,
-  signal,
 } from '@angular/core';
 import {
   FormBuilder,
+  FormControl,
   FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { debounceTime } from 'rxjs';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Observable, debounceTime, filter, switchMap } from 'rxjs';
 import {
   applicantReponse,
   endorserResponse,
 } from '../../../../infrastructure/interfaces';
 import { ApplicantService, EndorserService } from '../../../services';
 import { MaterialModule } from '../../../../material.module';
-import { ServerSelectSearchComponent } from '../../../components/server-select-search/server-select-search.component';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
-interface SelectOption {
-  value: endorserResponse;
-  text: string;
-}
 @Component({
   selector: 'applicant',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
-    MaterialModule,
-    ServerSelectSearchComponent,
-  ],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, MaterialModule],
   templateUrl: './applicant.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -46,12 +37,10 @@ export class ApplicantComponent implements OnInit {
   private fb = inject(FormBuilder);
   private endorserService = inject(EndorserService);
   private applicantService = inject(ApplicantService);
-
-  public applicant: applicantReponse | undefined = inject(MAT_DIALOG_DATA);
   private dialogRef = inject(MatDialogRef<ApplicantComponent>);
+  private destroyRef = inject(DestroyRef);
 
-  endorsers = signal<SelectOption[]>([]);
-  selectedEndorsers: endorserResponse[] = [];
+  applicant: applicantReponse | undefined = inject(MAT_DIALOG_DATA);
   FormApplicant = this.fb.group({
     firstname: ['', [Validators.required]],
     middlename: ['', [Validators.required]],
@@ -59,51 +48,53 @@ export class ApplicantComponent implements OnInit {
     dni: ['', [Validators.required]],
     professional_profile: [''],
     candidate_for: [''],
+    phone: [''],
   });
 
+  endorserCtrl = new FormControl('');
+  filteredEndorsers!: Observable<endorserResponse[]>;
+  endorsers: endorserResponse[] = [];
+
+  @ViewChild('endorserInput') endorserInput!: ElementRef<HTMLInputElement>;
+
   ngOnInit(): void {
-    this.FormApplicant.patchValue(this.applicant ?? {});
+    this.filteredEndorsers = this.endorserCtrl.valueChanges.pipe(
+      takeUntilDestroyed(this.destroyRef),
+      filter((term) => !!term),
+      debounceTime(350),
+      switchMap((term) => this.endorserService.searchAvailables(term!))
+    );
     if (this.applicant) {
-      this.selectedEndorsers = this.applicant.endorsers;
+      this.FormApplicant.patchValue(this.applicant);
+      this.endorsers = this.applicant.endorsers;
     }
   }
 
-  searchEndorsers(term: string) {
-    this.endorserService
-      .searchAvailables(term)
-      .pipe(debounceTime(300))
-      .subscribe((endorsers) => {
-        this.endorsers.set(
-          endorsers.map((el) => ({ value: el, text: el.name }))
-        );
-      });
-  }
-  setEndorser(value: endorserResponse) {
-    const exist = this.selectedEndorsers.some((el) => el._id === value._id);
-    if (exist) return;
-    this.selectedEndorsers.push(value);
+  remove(fruit: endorserResponse): void {
+    const index = this.endorsers.indexOf(fruit);
+    if (index >= 0) {
+      this.endorsers.splice(index, 1);
+    }
   }
 
-  remove(value: endorserResponse) {
-    this.selectedEndorsers = this.selectedEndorsers.filter(
-      (el) => el._id !== value._id
-    );
+  selected(event: MatAutocompleteSelectedEvent): void {
+    const endorser = event.option.value;
+    if (this.endorsers.some((el) => el._id === endorser._id)) return;
+    this.endorsers.push(endorser);
+    this.endorserInput.nativeElement.value = '';
+    this.endorserCtrl.setValue(null);
   }
 
   save() {
     if (!this.applicant) {
       this.applicantService
-        .create(this.selectedEndorsers, this.FormApplicant.value)
+        .create(this.endorsers, this.FormApplicant.value)
         .subscribe((data) => {
           this.dialogRef.close(data);
         });
     } else {
       this.applicantService
-        .update(
-          this.applicant._id,
-          this.selectedEndorsers,
-          this.FormApplicant.value
-        )
+        .update(this.applicant._id, this.endorsers, this.FormApplicant.value)
         .subscribe((data) => {
           this.dialogRef.close(data);
         });

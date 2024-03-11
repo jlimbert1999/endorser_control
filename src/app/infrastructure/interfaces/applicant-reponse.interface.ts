@@ -9,6 +9,8 @@ export interface applicantReponse {
   dni: string;
   professional_profile: string;
   candidate_for: string;
+  phone: string;
   endorsers: endorserResponse[];
   documents: ApplicantDocument[];
+  date?: string;
 }

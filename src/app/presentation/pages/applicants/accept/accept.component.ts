@@ -10,9 +10,10 @@ import { MaterialModule } from '../../../../material.module';
 import { ApplicantService } from '../../../services';
 import { ServerSelectSearchComponent } from '../../../components/server-select-search/server-select-search.component';
 import { Applicant } from '../../../../domain/models/applicant.model';
+import { chargeResponse } from '../../../../infrastructure/interfaces';
 
 interface SelectOption {
-  value: string;
+  value: chargeResponse;
   text: string;
 }
 @Component({
@@ -27,28 +28,28 @@ export class AcceptComponent {
   public applicant: Applicant = inject(MAT_DIALOG_DATA);
   public applicantService = inject(ApplicantService);
   jobs = signal<SelectOption[]>([]);
-  id_job: string | undefined = undefined;
+  job: chargeResponse | undefined = undefined;
   private dialogRef = inject(MatDialogRef<AcceptComponent>);
 
   seaarchJobs(term: string) {
     this.applicantService.searchjobs(term).subscribe((data) => {
       this.jobs.set(
         data.map((el) => ({
-          value: el._id,
+          value: el,
           text: `${el.contract} - ${el.name}`,
         }))
       );
     });
   }
 
-  setJob(value: string) {
-    this.id_job = value;
+  setJob(value: chargeResponse) {
+    this.job = value;
   }
 
   acept() {
-    if (!this.id_job) return;
+    if (!this.job) return;
     this.applicantService
-      .accept(this.applicant, this.id_job)
+      .accept(this.applicant, this.job._id, this.job.name)
       .subscribe((data) => {
         this.dialogRef.close(data);
       });

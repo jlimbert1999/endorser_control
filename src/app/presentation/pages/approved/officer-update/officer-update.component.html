@@ -8,15 +8,8 @@
     <dd class="col-sm-9">
       {{ applicant.dni }}
     </dd>
-
-    <dt class="col-sm-3">Perfil profesional:</dt>
-    <dd class="col-sm-9">
-      {{ applicant.professional_profile }}
-    </dd>
   </dl>
-  <hr />
   <mat-selection-list #shoes [(ngModel)]="selectedDocuments">
-    <div mat-subheader>Documentos presentados</div>
     @for (document of documents; track document) {
     <mat-list-option [value]="document">{{ document }}</mat-list-option>
     <mat-divider />

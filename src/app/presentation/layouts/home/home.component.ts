@@ -5,10 +5,11 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
+import { AuthService } from '../../services';
 
 @Component({
   selector: 'app-home',
@@ -26,6 +27,8 @@ import { map, shareReplay } from 'rxjs/operators';
   ],
 })
 export class HomeComponent {
+  private router = inject(Router);
+  private authService = inject(AuthService);
   private breakpointObserver = inject(BreakpointObserver);
 
   isHandset$: Observable<boolean> = this.breakpointObserver
@@ -34,4 +37,9 @@ export class HomeComponent {
       map((result) => result.matches),
       shareReplay()
     );
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }

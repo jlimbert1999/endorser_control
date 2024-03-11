@@ -37,6 +37,7 @@ export class ApplicantsComponent implements OnInit {
 
   displayedColumns = [
     'dni',
+    'phone',
     'fullname',
     'profile',
     'candidate',
