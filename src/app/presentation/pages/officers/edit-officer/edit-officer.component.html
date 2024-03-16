@@ -1,0 +1,55 @@
+<h2 mat-dialog-title>Edicion funcionario</h2>
+<mat-dialog-content>
+  <dl class="row">
+    <dt class="col-sm-3">Nombre completo:</dt>
+    <dd class="col-sm-9">{{ officer.fullname }}</dd>
+
+    <dt class="col-sm-3">Nro. Carnet</dt>
+    <dd class="col-sm-9">
+      {{ officer.dni }}
+    </dd>
+
+    <dt class="col-sm-3">Cargo:</dt>
+    <dd class="col-sm-9">
+      {{ officer.job?.name }}
+    </dd>
+  </dl>
+  <div class="row">
+    <div class="col-12">
+      <mat-form-field>
+        <mat-label>Listado de avales</mat-label>
+        <mat-chip-grid #chipGrid aria-label="Endorser selection">
+          @for (endor of endorsers; track endor) {
+          <mat-chip-row (removed)="remove(endor)">
+            {{ endor.name | titlecase }}
+            <button matChipRemove>
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip-row>
+          }
+        </mat-chip-grid>
+        <input
+          placeholder="Ingrese el nombre del aval"
+          #endorserInput
+          [formControl]="endorserCtrl"
+          [matChipInputFor]="chipGrid"
+          [matAutocomplete]="auto"
+        />
+        <mat-autocomplete
+          #auto="matAutocomplete"
+          (optionSelected)="selected($event)"
+        >
+          @for (endorser of filteredEndorsers | async; track endorser._id) {
+          <mat-option [value]="endorser">{{
+            endorser.name | titlecase
+          }}</mat-option>
+          }
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-button (click)="save()">Aceptar</button>
+</mat-dialog-actions>

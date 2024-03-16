@@ -16,7 +16,7 @@
     <input
       matInput
       (keyup)="applyFilter($event)"
-      placeholder="Nombre de la organizacion"
+      placeholder="Nombre del aval"
       #input
     />
   </mat-form-field>
@@ -57,6 +57,7 @@
     <mat-paginator
       [pageSizeOptions]="[10, 25, 100]"
       aria-label="Select page of users"
+      showFirstLastButtons
     ></mat-paginator>
   </div>
 </div>

@@ -11,6 +11,8 @@
       </div>
       <div matListItemLine>{{ applicant.dni }}</div>
     </mat-list-item>
+    } @empty {
+    <mat-list-item>Sin Avalados</mat-list-item>
     }
     <mat-divider></mat-divider>
   </mat-list>

@@ -7,6 +7,7 @@ import { ApprovedComponent } from './presentation/pages/approved/approved.compon
 import { ReportComponent } from './presentation/pages/report/report.component';
 import { LoginComponent } from './presentation/layouts/login/login.component';
 import { AuthGuard } from './presentation/guards/auth.guard';
+import { OfficersComponent } from './presentation/pages/officers/officers.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent, title: 'Inicio de sesion' },
@@ -40,7 +41,12 @@ export const routes: Routes = [
         component: OrganizationsComponent,
         title: 'Organizaciones',
       },
-      { path: '', redirectTo: 'applicants', pathMatch: 'full'   },
+      {
+        path: 'officers',
+        component: OfficersComponent,
+        title: 'Funcionarios',
+      },
+      { path: '', redirectTo: 'applicants', pathMatch: 'full' },
     ],
   },
 ];

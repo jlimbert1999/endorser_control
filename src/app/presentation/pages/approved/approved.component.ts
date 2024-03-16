@@ -7,26 +7,43 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { MatDialog } from '@angular/material/dialog';
+import {
+  trigger,
+  state,
+  style,
+  transition,
+  animate,
+} from '@angular/animations';
+
 import { AlertService, ApplicantService } from '../../services';
-import { Applicant } from '../../../domain/models/applicant.model';
 import { MaterialModule } from '../../../material.module';
 import { PaginatorComponent } from '../../components';
-import { MatDialog } from '@angular/material/dialog';
-import { OfficerRegisterComponent } from './officer-register/officer-register.component';
 import { OfficerUpdateComponent } from './officer-update/officer-update.component';
+import { Applicant } from '../../../domain/models/applicant.model';
 import { ApplicantDocument } from '../../../domain/interfaces/applicant-document.enum';
 import { AcceptComponent } from '../applicants/accept/accept.component';
 
 @Component({
   selector: 'app-approved',
   standalone: true,
-  imports: [CommonModule, MaterialModule, PaginatorComponent],
+  imports: [CommonModule, MaterialModule, PaginatorComponent, FormsModule],
+  styleUrl: './approved.component.css',
   templateUrl: './approved.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `.is-done {
-    background-color: #D8F3DC;
-  }
-  `,
+  providers: [provideNativeDateAdapter()],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed,void', style({ height: '0px', minHeight: '0' })),
+      state('expanded', style({ height: '*' })),
+      transition(
+        'expanded <=> collapsed',
+        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
+      ),
+    ]),
+  ],
 })
 export class ApprovedComponent implements OnInit {
   private applicantService = inject(ApplicantService);
@@ -35,14 +52,15 @@ export class ApprovedComponent implements OnInit {
 
   public columns = [
     'dni',
+    'phone',
     'fullname',
     'profile',
     'candidate',
-    'endorsers',
     'dj',
     'rj',
     's',
     'af',
+    'expand',
     'options',
   ];
   public datasource = signal<Applicant[]>([]);
@@ -51,6 +69,8 @@ export class ApprovedComponent implements OnInit {
   public limit = signal(10);
   public index = signal(0);
   public offset = computed(() => this.index() * this.limit());
+  public date: Date | undefined;
+  expandedElement: any | null;
 
   ngOnInit(): void {
     this.getData();
@@ -59,17 +79,18 @@ export class ApprovedComponent implements OnInit {
   getData() {
     const observable =
       this.term() !== ''
-        ? this.applicantService.search({
+        ? this.applicantService.search(this.term(), {
             limit: this.limit(),
             offset: this.offset(),
-            term: this.term(),
             status: 'accepted',
+            date: this.date,
           })
-        : this.applicantService.findAll(
-            'accepted',
-            this.limit(),
-            this.offset()
-          );
+        : this.applicantService.findAll({
+            status: 'accepted',
+            limit: this.limit(),
+            offset: this.offset(),
+            date: this.date,
+          });
     observable.subscribe((data) => {
       this.datasize.set(data.length);
       this.datasource.set(data.applicants);
@@ -134,8 +155,19 @@ export class ApprovedComponent implements OnInit {
     this.getData();
   }
 
+  applyFilterByDate() {
+    this.index.set(0);
+    this.getData();
+  }
+
   cancelFilter() {
     this.term.set('');
+    this.index.set(0);
+    this.getData();
+  }
+
+  cancelFilterDate() {
+    this.date = undefined;
     this.index.set(0);
     this.getData();
   }

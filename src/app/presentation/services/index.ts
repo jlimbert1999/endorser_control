@@ -4,3 +4,4 @@ export * from './endorser.service';
 export * from './alert.service';
 export * from './apparence.service';
 export * from './auth.service';
+export * from './officer.service';

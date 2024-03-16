@@ -38,7 +38,6 @@ export function loggingInterceptor(
           handleHttpErrors(error, alertService);
         }
       }
-      console.error(error);
       return throwError(() => Error);
     }),
     finalize(() => {

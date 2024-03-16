@@ -36,7 +36,7 @@ export class AcceptComponent {
       this.jobs.set(
         data.map((el) => ({
           value: el,
-          text: `${el.contract} - ${el.name}`,
+          text: `${el.tipoContrato} - ${el.nombre}`,
         }))
       );
     });
@@ -49,7 +49,7 @@ export class AcceptComponent {
   acept() {
     if (!this.job) return;
     this.applicantService
-      .accept(this.applicant, this.job._id, this.job.name)
+      .accept(this.applicant, this.job._id, this.job.nombre)
       .subscribe((data) => {
         this.dialogRef.close(data);
       });

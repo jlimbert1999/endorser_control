@@ -2,7 +2,6 @@ import { endorserResponse } from '../interfaces';
 
 export class CreateApplicantDto {
   static fromForm(selected: endorserResponse[], form: any) {
-    console.log(form);
     const endorsers = selected.map((el) => el._id);
     return new CreateApplicantDto(
       form['firstname'],

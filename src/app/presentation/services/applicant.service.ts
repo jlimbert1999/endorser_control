@@ -1,22 +1,22 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { map } from 'rxjs';
 import {
   applicantReponse,
   chargeResponse,
   endorserResponse,
 } from '../../infrastructure/interfaces';
 import { CreateApplicantDto } from '../../infrastructure/dtos/applicant-create.dto';
-import { AcceptApplicantDto } from '../../infrastructure/dtos/applincat-acept.dto';
-import { map } from 'rxjs';
 import { Applicant } from '../../domain/models/applicant.model';
 
 type status = 'accepted' | 'pending';
-interface searchParams {
+
+interface getApplicantParams {
   limit: number;
   offset: number;
-  term: string;
   status: status;
+  date?: Date;
 }
 @Injectable({
   providedIn: 'root',
@@ -35,21 +35,34 @@ export class ApplicantService {
       .pipe(map((resp) => this.responseToModels(resp)));
   }
 
-  findAll(status: status, limit: number, offset: number) {
-    const params = new HttpParams({ fromObject: { limit, offset } });
+  findAll({ limit, offset, status, date }: getApplicantParams) {
+    const params = new HttpParams({
+      fromObject: {
+        limit,
+        offset,
+        status,
+        ...(date && { date: date.getTime() }),
+      },
+    });
     return this.http
-      .get<{ applicants: applicantReponse[]; length: number }>(
-        `${this.url}/${status}`,
-        { params }
-      )
+      .get<{ applicants: applicantReponse[]; length: number }>(`${this.url}`, {
+        params,
+      })
       .pipe(map((resp) => this.responseToModels(resp)));
   }
 
-  search({ limit, offset, term, status }: searchParams) {
-    const params = new HttpParams({ fromObject: { limit, offset } });
+  search(term: string, { limit, offset, status, date }: getApplicantParams) {
+    const params = new HttpParams({
+      fromObject: {
+        limit,
+        offset,
+        status,
+        ...(date && { date: date.getTime() }),
+      },
+    });
     return this.http
       .get<{ applicants: applicantReponse[]; length: number }>(
-        `${this.url}/search/${status}/${term}`,
+        `${this.url}/search/${term}`,
         { params }
       )
       .pipe(map((resp) => this.responseToModels(resp)));

@@ -1,0 +1,23 @@
+.is-done {
+    background-color: #D8F3DC;
+}
+
+.mat-column-options {
+    width: 32px;
+    text-align: center;
+}
+
+.mat-column-expand {
+    width: 32px;
+    text-align: center;
+}
+
+
+tr.example-detail-row {
+    height: 0;
+}
+
+.example-element-detail {
+    overflow: hidden;
+    display: flex;
+}

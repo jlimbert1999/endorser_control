@@ -3,40 +3,70 @@
     <span>Aprobados</span>
     <span class="toolbar-spacer"></span>
   </mat-toolbar>
-  <div style="padding: 10px">
-    <mat-form-field>
-      <mat-label>Buscar postulante</mat-label>
-      <input
-        #inputsearch
-        matInput
-        [value]="term()"
-        (keydown.enter)="applyFilter(inputsearch.value)"
-        placeholder="Nombre de la organizacion"
-      />
-      @if (term()) {
-      <button
-        matSuffix
-        mat-icon-button
-        aria-label="Clear"
-        (click)="cancelFilter()"
-      >
-        <mat-icon>close</mat-icon>
-      </button>
-      }
-    </mat-form-field>
-
+  <div class="container-fluid mt-2">
+    <div class="row">
+      <div class="col-sm-9">
+        <mat-form-field>
+          <mat-label>Buscar aprobado</mat-label>
+          <input
+            #inputsearch
+            matInput
+            [value]="term()"
+            (keydown.enter)="applyFilter(inputsearch.value)"
+            placeholder="Nombre / Nro. carnet"
+          />
+          @if (term()) {
+          <button
+            matSuffix
+            mat-icon-button
+            aria-label="Clear"
+            (click)="cancelFilter()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+          }
+        </mat-form-field>
+      </div>
+      <div class="col-sm-3">
+        <mat-form-field>
+          @if(date){
+          <button mat-icon-button matSuffix (click)="cancelFilterDate()">
+            <mat-icon>close</mat-icon>
+          </button>
+          }
+          <mat-label>Fecha de aprobacion</mat-label>
+          <input
+            matInput
+            [matDatepicker]="picker"
+            [(ngModel)]="date"
+            (dateChange)="applyFilterByDate()"
+          />
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="picker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
+    </div>
     <div class="mat-elevation-z8">
-      <table mat-table [dataSource]="datasource()">
-        <ng-container matColumnDef="fullname">
-          <th mat-header-cell *matHeaderCellDef>Nombre</th>
-          <td mat-cell *matCellDef="let row">
-            {{ row.fullname | uppercase }}
-          </td>
-        </ng-container>
+      <table mat-table [dataSource]="datasource()" multiTemplateDataRows>
         <ng-container matColumnDef="dni">
           <th mat-header-cell *matHeaderCellDef>CI</th>
           <td mat-cell *matCellDef="let row">
             {{ row.dni }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="phone">
+          <th mat-header-cell *matHeaderCellDef>Telefono</th>
+          <td mat-cell *matCellDef="let row">
+            {{ row.phone }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="fullname">
+          <th mat-header-cell *matHeaderCellDef>Nombre</th>
+          <td mat-cell *matCellDef="let row">
+            {{ row.fullname | uppercase }}
           </td>
         </ng-container>
         <ng-container matColumnDef="profile">
@@ -49,18 +79,6 @@
           <th mat-header-cell *matHeaderCellDef>Candidato por</th>
           <td mat-cell *matCellDef="let row">
             {{ row.candidate_for === "" ? "-----" : row.candidate_for }}
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="endorsers">
-          <th mat-header-cell *matHeaderCellDef>Avales</th>
-          <td mat-cell *matCellDef="let row">
-            <ul class="p-2">
-              @for (item of row.endorsers; track $index) {
-              <li>{{ item.name | uppercase }}</li>
-              } @empty {
-              <li style="color: red">SIN AVAL</li>
-              }
-            </ul>
           </td>
         </ng-container>
         <ng-container matColumnDef="dj">
@@ -122,21 +140,73 @@
             </mat-menu>
           </td>
         </ng-container>
+        <ng-container matColumnDef="expand">
+          <th mat-header-cell *matHeaderCellDef aria-label="row actions">
+            &nbsp;
+          </th>
+          <td mat-cell *matCellDef="let element">
+            <button
+              mat-icon-button
+              aria-label="expand row"
+              (click)="
+                expandedElement = expandedElement === element ? null : element;
+                $event.stopPropagation()
+              "
+            >
+              @if (expandedElement === element) {
+              <mat-icon>keyboard_arrow_up</mat-icon>
+              } @else {
+              <mat-icon>keyboard_arrow_down</mat-icon>
+              }
+            </button>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="expandedDetail">
+          <td
+            mat-cell
+            *matCellDef="let element"
+            [attr.colspan]="columns.length"
+          >
+            <div
+              class="example-element-detail"
+              [@detailExpand]="
+                element == expandedElement ? 'expanded' : 'collapsed'
+              "
+            >
+              <div class="p-3">
+                <p class="fw-bold">Listado de avales:</p>
+                <ul>
+                  @for (item of element.endorsers; track $index) {
+                  <li>{{ item.name | uppercase }}</li>
+                  } @empty {
+                  <li style="color: red">SIN AVAL</li>
+                  }
+                </ul>
+              </div>
+            </div>
+          </td>
+        </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="columns"></tr>
         <tr
           mat-row
-          *matRowDef="let row; columns: columns"
-          [class.is-done]="row.isEnabled()"
+          *matRowDef="let element; columns: columns"
+          class="example-element-row"
+          [class.example-expanded-row]="expandedElement === element"
+          [class.is-done]="element.isEnabled()"
         ></tr>
-
+        <tr
+          mat-row
+          *matRowDef="let row; columns: ['expandedDetail']"
+          class="example-detail-row"
+        ></tr>
         <tr class="mat-row" *matNoDataRow>
-          <td class="mat-cell" colspan="2" style="padding: 10px">
+          <td class="mat-cell" colspan="10" style="padding: 20px">
             No se encontraron resultados
           </td>
         </tr>
       </table>
-
       <paginator
         (onPageChage)="changePage($event)"
         [length]="datasize()"

@@ -17,6 +17,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MaterialModule } from '../../../material.module';
 import { organizationResponse } from '../../../infrastructure/interfaces';
 import { OrganizationService } from '../../services';
+import { MatDialog } from '@angular/material/dialog';
+import { OrganizationComponent } from './organization/organization.component';
 
 @Component({
   selector: 'app-organizations',
@@ -29,6 +31,7 @@ import { OrganizationService } from '../../services';
 export class OrganizationsComponent implements OnInit {
   private organizationService = inject(OrganizationService);
   private fb = inject(FormBuilder);
+  private dialog = inject(MatDialog);
 
   displayedColumns: string[] = ['name', 'options'];
   dataSource!: MatTableDataSource<organizationResponse>;
@@ -59,13 +62,15 @@ export class OrganizationsComponent implements OnInit {
     });
   }
 
-  save() {
-    this.organizationService
-      .create(this.Form.value)
-      .subscribe((organization) => {
-        // this.datasource.update((values) => {
-        //   return [organization, ...values];
-        // });
-      });
+  add(): void {
+    const dialogRef = this.dialog.open(OrganizationComponent, { width: '700px' });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (!result) return;
+      this.dataSource = new MatTableDataSource([
+        result,
+        ...this.dataSource.data,
+      ]);
+      this.dataSource.paginator = this.paginator;
+    });
   }
 }
