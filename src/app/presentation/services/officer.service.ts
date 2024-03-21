@@ -59,6 +59,12 @@ export class OfficerService {
       );
   }
 
+  getByEndorser(id_endorser: string) {
+    return this.http.get<officerResponse[]>(
+      `${this.url}/endorsers/${id_endorser}`
+    );
+  }
+
   upload(data: any[]) {
     return this.http.post<{ ok: boolean }>(`${this.url}/upload`, data);
   }

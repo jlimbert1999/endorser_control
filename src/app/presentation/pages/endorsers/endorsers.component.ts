@@ -17,12 +17,14 @@ import {
 } from '../../../infrastructure/interfaces';
 import { OrganizationService } from '../../services/organization.service';
 import { EndorserComponent } from './endorser/endorser.component';
-import { ApplicantService } from '../../services';
+import { ApplicantService, OfficerService } from '../../services';
 import { MaterialModule } from '../../../material.module';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { DependentsComponent } from './dependents/dependents.component';
+import { DependentsOfficersComponent } from './dependents-officers/dependents-officers.component';
+import { MatMenuModule } from '@angular/material/menu';
 
 @Component({
   selector: 'app-endorsers',
@@ -32,6 +34,7 @@ import { DependentsComponent } from './dependents/dependents.component';
     ReactiveFormsModule,
     EndorserComponent,
     MaterialModule,
+    MatMenuModule,
   ],
   templateUrl: './endorsers.component.html',
   styleUrl: './endorsers.component.css',
@@ -41,7 +44,6 @@ export class EndorsersComponent implements OnInit {
   private endorserService = inject(EndorserService);
   private organizationService = inject(OrganizationService);
   private applicantService = inject(ApplicantService);
-  private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
 
   visible: boolean = false;
@@ -100,7 +102,15 @@ export class EndorsersComponent implements OnInit {
   }
 
   viewDetail(endorser: endorserResponse) {
-    this.dialog.open(DependentsComponent, { data: endorser, width:'800px' });
+    this.dialog.open(DependentsComponent, { data: endorser, width: '800px' });
+  }
+
+  viewDetailOfficer(endorser: endorserResponse) {
+    this.dialog.open(DependentsOfficersComponent, {
+      data: endorser,
+      autoFocus: false,
+      width: '800px',
+    });
   }
 
   applyFilter(event: Event) {
