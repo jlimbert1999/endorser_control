@@ -5,3 +5,4 @@ export * from './alert.service';
 export * from './apparence.service';
 export * from './auth.service';
 export * from './officer.service';
+export * from './pdf.service';

@@ -3,38 +3,32 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
-  ViewChild,
+  computed,
   inject,
   signal,
 } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-
-import { EndorserService } from '../../services/endorser.service';
-import {
-  applicantReponse,
-  endorserResponse,
-  organizationResponse,
-} from '../../../infrastructure/interfaces';
-import { OrganizationService } from '../../services/organization.service';
-import { EndorserComponent } from './endorser/endorser.component';
-import { ApplicantService, OfficerService } from '../../services';
-import { MaterialModule } from '../../../material.module';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
-import { DependentsComponent } from './dependents/dependents.component';
-import { DependentsOfficersComponent } from './dependents-officers/dependents-officers.component';
 import { MatMenuModule } from '@angular/material/menu';
+import { FormsModule } from '@angular/forms';
+
+import { EndorserComponent } from './endorser/endorser.component';
+import { EndorserService, PdfService } from '../../services';
+import { MaterialModule } from '../../../material.module';
+import { DetailApplicantsComponent } from './detail-applicants/detail-applicants.component';
+import { DetailOfficersComponent } from './detail-officers/detail-officers.component';
+import { Endorser } from '../../../domain/models';
+import { PaginatorComponent } from '../../components';
 
 @Component({
   selector: 'app-endorsers',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
     EndorserComponent,
     MaterialModule,
     MatMenuModule,
+    FormsModule,
+    PaginatorComponent,
   ],
   templateUrl: './endorsers.component.html',
   styleUrl: './endorsers.component.css',
@@ -42,27 +36,25 @@ import { MatMenuModule } from '@angular/material/menu';
 })
 export class EndorsersComponent implements OnInit {
   private endorserService = inject(EndorserService);
-  private organizationService = inject(OrganizationService);
-  private applicantService = inject(ApplicantService);
+  private pdfService = inject(PdfService);
   private dialog = inject(MatDialog);
 
-  visible: boolean = false;
-  dialogDetail = false;
-  datasource = signal<endorserResponse[]>([]);
-  organizations = signal<organizationResponse[]>([]);
-
-  applicants: applicantReponse[] = [];
-
-  displayedColumns: string[] = ['name', 'organization', 'options'];
-  dataSource!: MatTableDataSource<endorserResponse>;
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  datasource = signal<Endorser[]>([]);
+  datasize = signal(0);
+  displayedColumns: string[] = [
+    'name',
+    'organization',
+    'officers',
+    'applicants',
+    'options',
+  ];
+  term: string = '';
+  index = signal(0);
+  limit = signal(10);
+  offset = computed(() => this.limit() * this.index());
 
   ngOnInit(): void {
     this.getData();
-  }
-
-  create() {
-    this.visible = true;
   }
 
   save() {}
@@ -71,54 +63,52 @@ export class EndorsersComponent implements OnInit {
     const dialogRef = this.dialog.open(EndorserComponent, { width: '700px' });
     dialogRef.afterClosed().subscribe((result) => {
       if (!result) return;
-      this.dataSource = new MatTableDataSource([
-        result,
-        ...this.dataSource.data,
-      ]);
-      this.dataSource.paginator = this.paginator;
+      this.datasize.update((val) => (val += 1));
+      this.datasource.update((values) => {
+        return [result, ...values];
+      });
     });
   }
 
   getData() {
-    this.endorserService.findAll().subscribe((data) => {
-      this.dataSource = new MatTableDataSource(data.endorsers);
-      this.dataSource.paginator = this.paginator;
+    const observable =
+      this.term !== ''
+        ? this.endorserService.search(this.term, this.limit(), this.offset())
+        : this.endorserService.findAll(this.limit(), this.offset());
+    observable.subscribe((data) => {
+      this.datasource.set(data.endorsers);
+      this.datasize.set(data.length);
     });
   }
 
-  searchOrganizations(term: string) {
-    if (term === '') return;
-    this.organizationService.searchAvailable(term).subscribe((data) => {
-      this.organizations.set(data);
-    });
+  print() {
+    this.pdfService.generateEndorsers('Listado de avales', this.datasource());
   }
 
-  getApplicantsByEndorser(id_endorser: string) {
-    return this.applicantService
-      .getApplicantByEndorser(id_endorser)
-      .subscribe((data) => {
-        this.applicants = data;
-      });
-  }
-
-  viewDetail(endorser: endorserResponse) {
-    this.dialog.open(DependentsComponent, { data: endorser, width: '800px' });
-  }
-
-  viewDetailOfficer(endorser: endorserResponse) {
-    this.dialog.open(DependentsOfficersComponent, {
+  viewDetail(endorser: Endorser) {
+    this.dialog.open(DetailApplicantsComponent, {
       data: endorser,
       autoFocus: false,
       width: '800px',
     });
   }
 
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+  viewDetailOfficer(endorser: Endorser) {
+    this.dialog.open(DetailOfficersComponent, {
+      data: endorser,
+      autoFocus: false,
+      width: '800px',
+    });
+  }
 
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+  changePage(params: { limit: number; index: number }) {
+    this.limit.set(params.limit);
+    this.index.set(params.index);
+    this.getData();
+  }
+
+  applyFilter() {
+    this.index.set(0);
+    this.getData();
   }
 }

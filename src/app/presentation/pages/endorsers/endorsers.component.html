@@ -1,12 +1,16 @@
 <mat-toolbar color="primary">
   <span>Avales</span>
   <span class="toolbar-spacer"></span>
+
   <button
     mat-icon-button
-    class="example-icon favorite-icon"
-    aria-label="Example icon-button with heart icon"
-    (click)="add()"
+    matTooltip="Imprimir"
+    [disabled]="datasource().length === 0"
+    (click)="print()"
   >
+    <mat-icon>print</mat-icon>
+  </button>
+  <button mat-icon-button matTooltip="Agregar" (click)="add()">
     <mat-icon>add</mat-icon>
   </button>
 </mat-toolbar>
@@ -15,28 +19,41 @@
     <mat-label>Buscar aval</mat-label>
     <input
       matInput
-      (keyup)="applyFilter($event)"
-      placeholder="Nombre del aval"
+      (keyup.enter)="applyFilter()"
+      placeholder="Nombre: Aval / Organizacion"
+      [(ngModel)]="term"
       #input
     />
   </mat-form-field>
 
   <div class="mat-elevation-z8">
-    <table mat-table [dataSource]="dataSource" matSort>
+    <table mat-table [dataSource]="datasource()" matSort>
       <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
-        <td mat-cell *matCellDef="let row" style="font-weight: bold">
+        <th mat-header-cell *matHeaderCellDef>Nombre</th>
+        <td mat-cell *matCellDef="let row">
           {{ row.name | uppercase }}
         </td>
       </ng-container>
       <ng-container matColumnDef="organization">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Organizacion</th>
+        <th mat-header-cell *matHeaderCellDef>Organizacion</th>
         <td mat-cell *matCellDef="let row">
-          {{ row.organization?.name | uppercase }}
+          {{ row.organization }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="officers">
+        <th mat-header-cell *matHeaderCellDef>Funcionarios avalados</th>
+        <td mat-cell *matCellDef="let row">
+          {{ row.total_officers }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="applicants">
+        <th mat-header-cell *matHeaderCellDef>Postulantes avalados</th>
+        <td mat-cell *matCellDef="let row">
+          {{ row.total_applicants }}
         </td>
       </ng-container>
       <ng-container matColumnDef="options">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Opciones</th>
+        <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let row">
           <button mat-icon-button [matMenuTriggerFor]="menu">
             <mat-icon>visibility</mat-icon>
@@ -59,48 +76,16 @@
 
       <tr class="mat-row" *matNoDataRow>
         <td class="mat-cell" colspan="2" style="padding: 10px">
-          Sin resultados para: "{{ input.value }}"
+          Sin resultados
         </td>
       </tr>
     </table>
 
-    <mat-paginator
-      [pageSizeOptions]="[10, 25, 100]"
-      aria-label="Select page of users"
-      showFirstLastButtons
-    ></mat-paginator>
+    <paginator
+      [limit]="limit()"
+      [index]="index()"
+      [length]="datasize()"
+      (onPageChage)="changePage($event)"
+    />
   </div>
 </div>
-
-<!-- <p-dialog
-  header="Avalados"
-  [(visible)]="dialogDetail"
-  [modal]="true"
-  [draggable]="false"
-  [resizable]="false"
-  [style]="{ width: '900px' }"
->
-  @if (applicants.length>0) {
-  <p-table [value]="applicants" [tableStyle]="{ 'min-width': '50rem' }">
-    <ng-template pTemplate="header">
-      <tr>
-        <th>Nro</th>
-        <th>Nombre</th>
-        <th>CI</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-product let-rowIndex="rowIndex">
-      <tr>
-        <td>{{ rowIndex + 1 }}</td>
-        <td>
-          {{ product.firstname }} {{ product.middlename }}
-          {{ product.lastname }}
-        </td>
-        <td>{{ product.dni }}</td>
-      </tr>
-    </ng-template>
-  </p-table>
-  } @else {
-  <p>Sin avalados</p>
-  }
-</p-dialog> -->

@@ -160,7 +160,7 @@ export class ApplicantsComponent implements OnInit {
           type: 'binary',
           cellDates: true,
         });
-        const data = utils.sheet_to_json<any>(wb.Sheets[wb.SheetNames[2]]);
+        const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[1]]);
         this.applicantService.upload(data).subscribe((resp) => {
         });
       };

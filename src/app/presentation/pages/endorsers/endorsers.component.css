@@ -1,0 +1,11 @@
+.mat-column-officers,
+.mat-column-applicants {
+    width: 140px;
+    text-align: center;
+    font-style: italic;
+}
+
+
+.mat-column-options {
+    width: 32px;
+}

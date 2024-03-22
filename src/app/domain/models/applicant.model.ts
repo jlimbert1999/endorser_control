@@ -17,7 +17,6 @@ interface aplicantProps {
 
 interface endorser {
   name: string;
-  organization: string;
 }
 export class Applicant {
   _id: string;
@@ -41,7 +40,9 @@ export class Applicant {
       dni: response.dni,
       candidate_for: response.candidate_for,
       professional_profile: response.professional_profile,
-      endorsers: response.endorsers,
+      endorsers: response.endorsers.map((el) => ({
+        name: el.name,
+      })),
       documents: response.documents,
       phone: response.phone,
       date: response.date ? new Date(response.date) : undefined,
