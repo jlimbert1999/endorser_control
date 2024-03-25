@@ -16,6 +16,7 @@ interface aplicantProps {
 }
 
 interface endorser {
+  _id: string;
   name: string;
 }
 export class Applicant {
@@ -41,6 +42,7 @@ export class Applicant {
       candidate_for: response.candidate_for,
       professional_profile: response.professional_profile,
       endorsers: response.endorsers.map((el) => ({
+        _id: el._id,
         name: el.name,
       })),
       documents: response.documents,
