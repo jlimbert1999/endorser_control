@@ -19,12 +19,10 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, debounceTime, filter, switchMap } from 'rxjs';
-import {
-  applicantReponse,
-  endorserResponse,
-} from '../../../../infrastructure/interfaces';
 import { ApplicantService, EndorserService } from '../../../services';
 import { MaterialModule } from '../../../../material.module';
+import { Applicant, endorser } from '../../../../domain/models';
+import { endorserResponse } from '../../../../infrastructure/interfaces';
 
 @Component({
   selector: 'applicant',
@@ -40,7 +38,7 @@ export class ApplicantComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<ApplicantComponent>);
   private destroyRef = inject(DestroyRef);
 
-  applicant: applicantReponse | undefined = inject(MAT_DIALOG_DATA);
+  applicant: Applicant | undefined = inject(MAT_DIALOG_DATA);
   FormApplicant = this.fb.group({
     firstname: ['', [Validators.required]],
     middlename: ['', [Validators.required]],
@@ -53,7 +51,7 @@ export class ApplicantComponent implements OnInit {
 
   endorserCtrl = new FormControl('');
   filteredEndorsers!: Observable<endorserResponse[]>;
-  endorsers: endorserResponse[] = [];
+  endorsers: endorser[] = [];
 
   @ViewChild('endorserInput') endorserInput!: ElementRef<HTMLInputElement>;
 
@@ -66,11 +64,11 @@ export class ApplicantComponent implements OnInit {
     );
     if (this.applicant) {
       this.FormApplicant.patchValue(this.applicant);
-      this.endorsers = this.applicant.endorsers;
+      this.endorsers = [...this.applicant.endorsers];
     }
   }
 
-  remove(fruit: endorserResponse): void {
+  remove(fruit: endorser): void {
     const index = this.endorsers.indexOf(fruit);
     if (index >= 0) {
       this.endorsers.splice(index, 1);

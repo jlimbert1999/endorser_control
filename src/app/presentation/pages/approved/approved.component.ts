@@ -25,6 +25,7 @@ import { OfficerUpdateComponent } from './officer-update/officer-update.componen
 import { Applicant } from '../../../domain/models/applicant.model';
 import { ApplicantDocument } from '../../../domain/interfaces/applicant-document.enum';
 import { AcceptComponent } from '../applicants/accept/accept.component';
+import { ApplicantComponent } from '../applicants/applicant/applicant.component';
 
 @Component({
   selector: 'app-approved',
@@ -120,6 +121,7 @@ export class ApprovedComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (!result) return;
+      this.datasize.update((values) => (values -= 1));
       this.datasource.update((values) => {
         const data = values.filter((el) => el._id !== applicant._id);
         return [...data];
@@ -128,6 +130,21 @@ export class ApprovedComponent implements OnInit {
   }
 
   update(applicant: Applicant) {
+    const dialogRef = this.dialog.open(ApplicantComponent, {
+      data: applicant,
+      autoFocus: false,
+      width: '1000px',
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (!result) return;
+      this.datasource.update((values) => {
+        const index = values.findIndex((el) => el._id === applicant._id);
+        values[index] = result;
+        return [...values];
+      });
+    });
+  }
+  updateDocuments(applicant: Applicant) {
     const dialogRef = this.dialog.open(OfficerUpdateComponent, {
       width: '700px',
       data: applicant,

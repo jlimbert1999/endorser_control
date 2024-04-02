@@ -127,6 +127,10 @@
             <mat-menu #menu="matMenu">
               <button mat-menu-item (click)="update(row)">
                 <mat-icon>edit</mat-icon>
+                <span>Editar postulante</span>
+              </button>
+              <button mat-menu-item (click)="updateDocuments(row)">
+                <mat-icon>edit_note</mat-icon>
                 <span>Editar documentos</span>
               </button>
               <button mat-menu-item (click)="remove(row)">

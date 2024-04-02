@@ -15,7 +15,7 @@ interface aplicantProps {
   date?: Date;
 }
 
-interface endorser {
+export interface endorser {
   _id: string;
   name: string;
 }

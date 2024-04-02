@@ -33,7 +33,7 @@ export class PdfService {
             bold: true,
           },
           {
-            text: `${endorser.name} - ${endorser.organization}`,
+            text: `${endorser.name} - ${endorser.organization?.name}`,
           },
         ],
         marginBottom: 20,
@@ -79,7 +79,7 @@ export class PdfService {
             bold: true,
           },
           {
-            text: `${endorser.name} - ${endorser.organization}`,
+            text: `${endorser.name} - ${endorser.organization?.name}`,
           },
         ],
         marginBottom: 20,
@@ -130,7 +130,7 @@ export class PdfService {
             ],
             ...endorser.map((el) => [
               el.name,
-              el.organization,
+              el.organization ? el.organization.name : '',
               el.total_officers,
               el.total_applicants,
             ]),

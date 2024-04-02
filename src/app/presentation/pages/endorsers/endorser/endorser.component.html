@@ -11,6 +11,7 @@
       <div class="col-12">
         <server-select-search
           placeholder="Buscar organizacion"
+          [initialValue]="endorser?.organization?._id"
           [data]="organizations()"
           (onSearch)="searchOrganizations($event)"
           (onSelect)="setOrganization($event)"
@@ -20,6 +21,13 @@
   </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancelar</button>
-  <button mat-button [disabled]="Form.invalid" (click)="save()">Aceptar</button>
+  <button mat-flat-button color="warn" mat-dialog-close>Cancelar</button>
+  <button
+    mat-flat-button
+    color="primary"
+    [disabled]="Form.invalid"
+    (click)="save()"
+  >
+    Aceptar
+  </button>
 </mat-dialog-actions>

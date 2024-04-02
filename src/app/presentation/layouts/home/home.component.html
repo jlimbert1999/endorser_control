@@ -9,7 +9,7 @@
     style="padding: 10px"
   >
     <mat-toolbar>Menu</mat-toolbar>
-    <mat-nav-list>
+    <mat-list>
       <mat-list-item routerLink="organizations" routerLinkActive="active">
         <mat-icon matListItemIcon>diversity_2</mat-icon>
         <div matListItemTitle>Organizaciones</div>
@@ -34,15 +34,12 @@
         <mat-icon matListItemIcon>description</mat-icon>
         <div matListItemTitle>Reporte</div>
       </mat-list-item>
-    </mat-nav-list>
-
-    <mat-toolbar class="footer">
-      <button mat-icon-button (click)="logout()">
-        <mat-icon>logout</mat-icon>
-      </button>
-    </mat-toolbar>
+    </mat-list>
+    <button mat-icon-button  matTooltip="Cerrar sesion" class="footer mx-3" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+    </button>
   </mat-sidenav>
-  <mat-sidenav-content>
+  <mat-sidenav-content class="content">
     <router-outlet></router-outlet>
   </mat-sidenav-content>
 </mat-sidenav-container>

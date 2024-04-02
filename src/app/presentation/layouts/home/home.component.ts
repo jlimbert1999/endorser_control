@@ -10,6 +10,7 @@ import { AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { AuthService } from '../../services';
+import { MaterialModule } from '../../../material.module';
 
 @Component({
   selector: 'app-home',
@@ -17,13 +18,9 @@ import { AuthService } from '../../services';
   styleUrl: './home.component.css',
   standalone: true,
   imports: [
-    MatToolbarModule,
-    MatButtonModule,
-    MatSidenavModule,
-    MatListModule,
-    MatIconModule,
     AsyncPipe,
     RouterModule,
+    MaterialModule,
   ],
 })
 export class HomeComponent {

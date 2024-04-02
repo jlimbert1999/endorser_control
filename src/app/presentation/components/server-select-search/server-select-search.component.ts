@@ -37,7 +37,7 @@ type MatSelectSearchData<T> = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServerSelectSearchComponent<T> implements OnInit, OnDestroy {
-  @Input() set initialValue(value: T) {
+  @Input() set initialValue(value: T | null) {
     this.bankCtrl.setValue(value);
   }
   @Input() placeholder = 'Buscar....';

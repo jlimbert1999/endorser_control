@@ -3,14 +3,18 @@ import { endorserResponse } from '../../infrastructure/interfaces';
 interface endorserProps {
   id: string;
   name: string;
-  organization: string;
+  organization?: organization;
   total_officers: number;
   total_applicants: number;
+}
+interface organization {
+  _id: string;
+  name: string;
 }
 export class Endorser {
   id: string;
   name: string;
-  organization: string;
+  organization?: organization;
   total_officers: number;
   total_applicants: number;
 
@@ -18,7 +22,9 @@ export class Endorser {
     return new Endorser({
       id: endorser._id,
       name: endorser.name,
-      organization: endorser.organization?.name ?? 'SIN ORGANIZACION',
+      organization: endorser.organization
+        ? { _id: endorser.organization._id, name: endorser.organization.name }
+        : undefined,
       total_applicants: endorser.applicants ?? 0,
       total_officers: endorser.officers ?? 0,
     });

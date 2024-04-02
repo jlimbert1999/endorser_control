@@ -27,6 +27,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EndorserService, OfficerService } from '../../../services';
 import { Officer } from '../../../../domain/models/officer.model';
 import { MatButtonModule } from '@angular/material/button';
+import { endorser } from '../../../../domain/models';
 
 @Component({
   selector: 'app-edit-officer',
@@ -55,7 +56,7 @@ export class EditOfficerComponent implements OnInit {
 
   endorserCtrl = new FormControl('');
   filteredEndorsers!: Observable<endorserResponse[]>;
-  endorsers: endorserResponse[] = [];
+  endorsers: endorser[] = [];
 
   @ViewChild('endorserInput') endorserInput!: ElementRef<HTMLInputElement>;
 
@@ -69,7 +70,7 @@ export class EditOfficerComponent implements OnInit {
     );
   }
 
-  remove(fruit: endorserResponse): void {
+  remove(fruit: endorser): void {
     const index = this.endorsers.indexOf(fruit);
     if (index >= 0) {
       this.endorsers.splice(index, 1);

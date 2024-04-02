@@ -6,7 +6,7 @@
 
     <dt class="col-sm-3 fw-bold">Organizacion:</dt>
     <dd class="col-sm-9">
-      {{ endorser.organization }}
+      {{ endorser.organization?.name }}
     </dd>
 
     <dt class="col-sm-3 fw-bold">Total:</dt>
@@ -53,5 +53,5 @@
   </button>
   }
 
-  <button mat-button mat-dialog-close>Cerrar</button>
+  <button  mat-flat-button color="warn" mat-dialog-close>Cerrar</button>
 </mat-dialog-actions>

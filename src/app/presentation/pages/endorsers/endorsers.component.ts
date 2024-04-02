@@ -70,6 +70,21 @@ export class EndorsersComponent implements OnInit {
     });
   }
 
+  edit(endorser: Endorser) {
+    const dialogRef = this.dialog.open(EndorserComponent, {
+      width: '700px',
+      data: endorser,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (!result) return;
+      this.datasource.update((values) => {
+        const index = values.findIndex((el) => endorser.id === el.id);
+        values[index] = result;
+        return [...values];
+      });
+    });
+  }
+
   getData() {
     const observable =
       this.term !== ''

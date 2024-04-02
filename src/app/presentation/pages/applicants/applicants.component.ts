@@ -7,17 +7,22 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import {
+  trigger,
+  state,
+  style,
+  transition,
+  animate,
+} from '@angular/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { AlertService, ApplicantService } from '../../services';
-
-import { applicantReponse } from '../../../infrastructure/interfaces';
 import { ApplicantComponent } from './applicant/applicant.component';
 import { MaterialModule } from '../../../material.module';
 import { Applicant } from '../../../domain/models/applicant.model';
 import { PaginatorComponent } from '../../components';
-import Swal from 'sweetalert2';
-import { read, utils } from 'xlsx';
+// import Swal from 'sweetalert2';
+// import { read, utils } from 'xlsx';
 @Component({
   selector: 'app-applicants',
   standalone: true,
@@ -30,20 +35,32 @@ import { read, utils } from 'xlsx';
     PaginatorComponent,
   ],
   templateUrl: './applicants.component.html',
+  styleUrl: './applicants.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({ height: '0px', minHeight: '0' })),
+      state('expanded', style({ height: '*' })),
+      transition(
+        'expanded <=> collapsed',
+        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
+      ),
+    ]),
+  ],
 })
 export class ApplicantsComponent implements OnInit {
   private applicantService = inject(ApplicantService);
   private alertService = inject(AlertService);
   private dialog = inject(MatDialog);
 
+  expandedElement: any | null;
   displayedColumns = [
     'dni',
     'phone',
     'fullname',
     'profile',
     'candidate',
-    'endorsers',
+    'expand',
     'options',
   ];
   term = signal<string>('');
@@ -88,7 +105,7 @@ export class ApplicantsComponent implements OnInit {
     });
   }
 
-  edit(applicant: applicantReponse) {
+  edit(applicant: Applicant) {
     const dialogRef = this.dialog.open(ApplicantComponent, {
       data: applicant,
       autoFocus: false,
@@ -138,32 +155,31 @@ export class ApplicantsComponent implements OnInit {
     this.getData();
   }
 
-  async loadExcelFile() {
-    const { value: file } = await Swal.fire({
-      title: 'Seleccione el archivo a cargar',
-      text: 'Formatos permitidos :ods, csv, xlsx',
-      input: 'file',
-      showCancelButton: true,
-      confirmButtonText: 'Aceptar',
-      cancelButtonText: 'Cancelar',
-      inputAttributes: {
-        accept:
-          '.ods, csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel',
-        'aria-label': 'Cargar archivo excel',
-      },
-    });
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsBinaryString(file);
-      reader.onload = (e) => {
-        const wb = read(reader.result, {
-          type: 'binary',
-          cellDates: true,
-        });
-        const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[1]]);
-        this.applicantService.upload(data).subscribe((resp) => {
-        });
-      };
-    }
-  }
+  // async loadExcelFile() {
+  //   const { value: file } = await Swal.fire({
+  //     title: 'Seleccione el archivo a cargar',
+  //     text: 'Formatos permitidos :ods, csv, xlsx',
+  //     input: 'file',
+  //     showCancelButton: true,
+  //     confirmButtonText: 'Aceptar',
+  //     cancelButtonText: 'Cancelar',
+  //     inputAttributes: {
+  //       accept:
+  //         '.ods, csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel',
+  //       'aria-label': 'Cargar archivo excel',
+  //     },
+  //   });
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.readAsBinaryString(file);
+  //     reader.onload = (e) => {
+  //       const wb = read(reader.result, {
+  //         type: 'binary',
+  //         cellDates: true,
+  //       });
+  //       const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[1]]);
+  //       this.applicantService.upload(data).subscribe((resp) => {});
+  //     };
+  //   }
+  // }
 }

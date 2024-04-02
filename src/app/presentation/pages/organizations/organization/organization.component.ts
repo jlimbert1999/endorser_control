@@ -1,11 +1,21 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  inject,
+} from '@angular/core';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { OrganizationService } from '../../../services';
-import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { OrganizationService } from '../../../services';
+import { organizationResponse } from '../../../../infrastructure/interfaces';
 
 @Component({
   selector: 'app-organization',
@@ -22,20 +32,35 @@ import { MatButtonModule } from '@angular/material/button';
   templateUrl: './organization.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OrganizationComponent {
+export class OrganizationComponent implements OnInit {
   private fb = inject(FormBuilder);
   private orgService = inject(OrganizationService);
   private dialogRef = inject(MatDialogRef<OrganizationComponent>);
+
+  organization: organizationResponse | undefined = inject(MAT_DIALOG_DATA);
 
   Form = this.fb.nonNullable.group({
     name: ['', Validators.required],
   });
 
+  ngOnInit(): void {
+    if (this.organization) {
+      this.Form.patchValue(this.organization);
+    }
+  }
   save() {
-    this.orgService
-      .create({ name: this.Form.get('name')?.value! })
-      .subscribe((data) => {
-        this.dialogRef.close(data);
-      });
+    if (this.organization) {
+      this.orgService
+        .update(this.organization._id, this.Form.value)
+        .subscribe((data) => {
+          this.dialogRef.close(data);
+        });
+    } else {
+      this.orgService
+        .create({ name: this.Form.get('name')?.value! })
+        .subscribe((data) => {
+          this.dialogRef.close(data);
+        });
+    }
   }
 }

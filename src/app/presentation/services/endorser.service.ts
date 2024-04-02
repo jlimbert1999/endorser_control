@@ -21,6 +21,20 @@ export class EndorserService {
       .pipe(map((el) => Endorser.fromResponse(el)));
   }
 
+  update(endorser: Endorser, data: { name: string; organization: string }) {
+    return this.http
+      .put<endorserResponse>(`${this.url}/${endorser.id}`, data)
+      .pipe(
+        map((el) =>
+          Endorser.fromResponse({
+            ...el,
+            officers: endorser.total_officers,
+            applicants: endorser.total_applicants,
+          })
+        )
+      );
+  }
+
   findAll(limit: number, offset: number) {
     const params = new HttpParams({ fromObject: { limit, offset } });
     return this.http

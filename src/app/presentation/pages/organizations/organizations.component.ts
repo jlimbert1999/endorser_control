@@ -4,11 +4,14 @@ import {
   Component,
   OnInit,
   ViewChild,
+  computed,
   inject,
+  signal,
 } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -19,11 +22,18 @@ import { organizationResponse } from '../../../infrastructure/interfaces';
 import { OrganizationService } from '../../services';
 import { MatDialog } from '@angular/material/dialog';
 import { OrganizationComponent } from './organization/organization.component';
+import { PaginatorComponent } from '../../components';
 
 @Component({
   selector: 'app-organizations',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MaterialModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MaterialModule,
+    FormsModule,
+    PaginatorComponent,
+  ],
   templateUrl: './organizations.component.html',
   styleUrl: './organizations.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -33,8 +43,14 @@ export class OrganizationsComponent implements OnInit {
   private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
 
+  term: string = '';
+  index = signal(0);
+  limit = signal(10);
+  offset = computed(() => this.limit() * this.index());
+
+  datasource = signal<organizationResponse[]>([]);
+  datasize = signal<number>(0);
   displayedColumns: string[] = ['name', 'options'];
-  dataSource!: MatTableDataSource<organizationResponse>;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   Form: FormGroup = this.fb.nonNullable.group({
     name: ['', Validators.required],
@@ -46,31 +62,58 @@ export class OrganizationsComponent implements OnInit {
     this.getData();
   }
 
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+  add(): void {
+    const dialogRef = this.dialog.open(OrganizationComponent, {
+      width: '700px',
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (!result) return;
+      this.datasource.update((values) => {
+        if (values.length === this.limit()) values.pop();
+        return [result, ...values];
+      });
+      this.datasize.update((value) => (value += 1));
+    });
+  }
 
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+  edit(organization: organizationResponse) {
+    const dialogRef = this.dialog.open(OrganizationComponent, {
+      width: '700px',
+      data: organization,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (!result) return;
+      this.datasource.update((values) => {
+        const index = values.findIndex((el) => el._id === organization._id);
+        values[index] = result;
+        return [...values];
+      });
+    });
   }
 
   getData() {
-    this.organizationService.findAll().subscribe((resp) => {
-      this.dataSource = new MatTableDataSource(resp.organizations);
-      this.dataSource.paginator = this.paginator;
+    const observable =
+      this.term !== ''
+        ? this.organizationService.search(
+            this.term,
+            this.limit(),
+            this.offset()
+          )
+        : this.organizationService.findAll(this.limit(), this.offset());
+    observable.subscribe((data) => {
+      this.datasource.set(data.organizations);
+      this.datasize.set(data.length);
     });
   }
 
-  add(): void {
-    const dialogRef = this.dialog.open(OrganizationComponent, { width: '700px' });
-    dialogRef.afterClosed().subscribe((result) => {
-      if (!result) return;
-      this.dataSource = new MatTableDataSource([
-        result,
-        ...this.dataSource.data,
-      ]);
-      this.dataSource.paginator = this.paginator;
-    });
+  changePage(params: { limit: number; index: number }) {
+    this.limit.set(params.limit);
+    this.index.set(params.index);
+    this.getData();
+  }
+
+  applyFilter() {
+    this.index.set(0);
+    this.getData();
   }
 }

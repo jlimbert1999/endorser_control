@@ -8,7 +8,7 @@ import {
   endorserResponse,
 } from '../../infrastructure/interfaces';
 import { CreateApplicantDto } from '../../infrastructure/dtos/applicant-create.dto';
-import { Applicant } from '../../domain/models/applicant.model';
+import { Applicant, endorser } from '../../domain/models/applicant.model';
 
 type status = 'accepted' | 'pending';
 
@@ -17,6 +17,12 @@ interface getApplicantParams {
   offset: number;
   status: status;
   date?: Date;
+}
+
+interface accepApplicantProps {
+  id_job: string;
+  name: string;
+  dni: string;
 }
 @Injectable({
   providedIn: 'root',
@@ -68,12 +74,14 @@ export class ApplicantService {
       .pipe(map((resp) => this.responseToModels(resp)));
   }
 
-  create(selectedEndorsers: endorserResponse[], form: Object) {
+  create(selectedEndorsers: endorser[], form: Object) {
     const applicant = CreateApplicantDto.fromForm(selectedEndorsers, form);
-    return this.http.post<applicantReponse>(`${this.url}`, applicant);
+    return this.http
+      .post<applicantReponse>(`${this.url}`, applicant)
+      .pipe(map((resp) => Applicant.fromResponse(resp)));
   }
 
-  update(id: string, selectedEndorsers: endorserResponse[], form: Object) {
+  update(id: string, selectedEndorsers: endorser[], form: Object) {
     const applicant = CreateApplicantDto.fromForm(selectedEndorsers, form);
     return this.http
       .put<applicantReponse>(`${this.url}/${id}`, applicant)
@@ -94,11 +102,8 @@ export class ApplicantService {
     return this.http.get<chargeResponse[]>(`${this.url}/jobs/${term}`);
   }
 
-  accept(data: Applicant, id_job: string, name: string) {
-    return this.http.post<boolean>(`${this.url}/accept/${data._id}`, {
-      id_job,
-      name,
-    });
+  accept(data: Applicant, props: accepApplicantProps) {
+    return this.http.post<boolean>(`${this.url}/accept/${data._id}`, props);
   }
 
   getApplicantByEndorser(id_endorser: string) {

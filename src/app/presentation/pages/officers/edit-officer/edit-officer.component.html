@@ -29,7 +29,7 @@
           }
         </mat-chip-grid>
         <input
-          placeholder="Ingrese el nombre del aval"
+          placeholder="Nombre del aval / Organizacion"
           #endorserInput
           [formControl]="endorserCtrl"
           [matChipInputFor]="chipGrid"
@@ -40,9 +40,10 @@
           (optionSelected)="selected($event)"
         >
           @for (endorser of filteredEndorsers | async; track endorser._id) {
-          <mat-option [value]="endorser">{{
-            endorser.name | titlecase
-          }}</mat-option>
+          <mat-option [value]="endorser">
+            {{ endorser.name | titlecase }} -
+            {{ endorser.organization?.name ?? "SIN ORGANIZACION" }}
+          </mat-option>
           }
         </mat-autocomplete>
       </mat-form-field>
@@ -50,6 +51,6 @@
   </div>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancelar</button>
-  <button mat-button (click)="save()">Aceptar</button>
+  <button mat-flat-button color="warn" mat-dialog-close>Cancelar</button>
+  <button mat-flat-button color="primary" (click)="save()">Aceptar</button>
 </mat-dialog-actions>

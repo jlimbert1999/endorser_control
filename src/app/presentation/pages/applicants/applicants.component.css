@@ -1,0 +1,13 @@
+tr.detail-row {
+    height: 0;
+}
+
+.mat-column-options {
+    width: 32px;
+    text-align: center;
+}
+
+.mat-column-expand {
+    width: 32px;
+    text-align: center;
+}

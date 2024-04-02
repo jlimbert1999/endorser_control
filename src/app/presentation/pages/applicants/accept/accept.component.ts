@@ -49,7 +49,11 @@ export class AcceptComponent {
   acept() {
     if (!this.job) return;
     this.applicantService
-      .accept(this.applicant, this.job._id, this.job.nombre)
+      .accept(this.applicant, {
+        id_job: this.job._id,
+        name: this.job.nombre,
+        dni: this.applicant.dni,
+      })
       .subscribe((data) => {
         this.dialogRef.close(data);
       });
